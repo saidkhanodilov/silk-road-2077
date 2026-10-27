@@ -66,7 +66,7 @@
 
     <div class="topbar-actions">
       <button class="chip-btn play-chip" type="button" data-launch-game>
-        <span aria-hidden="true">🐫</span> <span class="play-chip-label">Play</span>
+        <span aria-hidden="true">🐫</span> <span class="play-chip-label">Play<span class="sr-only"> Silk Road 2077</span></span>
       </button>
       <button class="chip-btn trophy-chip" type="button" id="trophy-btn" aria-haspopup="dialog" aria-label="Achievements">
         <span aria-hidden="true">🏆</span> <span id="trophy-count">0</span><span class="trophy-total">/12</span>
@@ -102,7 +102,8 @@
           <span class="glitch" data-text="SAIDMUXAMMADXON">Saidmuxammadxon</span>
           <span class="hero-surname">Odilov</span>
         </h1>
-        <p class="hero-role mono reveal" aria-label="Java backend engineer, rocket simulator, AWS Student Builder Group Leader">
+        <p class="hero-role mono reveal">
+          <span class="sr-only">Java backend engineer, rocket simulator, AWS Student Builder Group Leader</span>
           <span class="prompt" aria-hidden="true">&gt;</span>
           <span id="typed" aria-hidden="true">Java backend engineer</span><span class="caret" aria-hidden="true"></span>
         </p>
@@ -450,7 +451,7 @@
             </li>
           </ol>
 
-          <aside class="edu holo tilt reveal" aria-labelledby="edu-title">
+          <div class="edu holo tilt reveal">
             <p class="mono tiny dim">ACADEMY</p>
             <h3 id="edu-title">Central Asian University</h3>
             <p>BSc Computer Science · Sep 2026 to Jun 2030 (expected)</p>
@@ -464,7 +465,7 @@
               <li><b>Harvard CS50x</b> Introduction to Computer Science</li>
               <li><b>freeCodeCamp</b> Responsive Web Design</li>
             </ul>
-          </aside>
+          </div>
         </div>
       </div>
     </section>
