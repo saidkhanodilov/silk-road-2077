@@ -1,0 +1,574 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Saidmuxammadxon Odilov · Silk Road 2077</title>
+  <meta name="description" content="Portfolio of Saidmuxammadxon Odilov, a Computer Science student in Tashkent who builds secure Java backends, simulates rockets in C++, and leads the AWS Student Builder Group at Central Asian University. Fly the Silk Road 2077 to explore it.">
+  <meta name="author" content="Saidmuxammadxon Odilov">
+  <meta name="theme-color" content="#04050d">
+  <meta name="color-scheme" content="dark">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Saidmuxammadxon Odilov · Silk Road 2077">
+  <meta property="og:description" content="Java backends, rocket simulators and a camel spaceship. Fly the Silk Road 2077 through my story.">
+  <meta property="og:image" content="assets/img/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Saidmuxammadxon Odilov in neon letters beside a glowing dot-matrix globe with a beacon on Tashkent">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="assets/fonts/orbitron.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/space-grotesk.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/main.css">
+  <script type="module" src="assets/js/main.js"></script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Saidmuxammadxon Odilov",
+    "jobTitle": "Computer Science student and software developer",
+    "alumniOf": "Central Asian University",
+    "address": { "@type": "PostalAddress", "addressLocality": "Tashkent", "addressCountry": "UZ" },
+    "sameAs": [
+      "https://www.linkedin.com/in/saidmuxammadxon-odilov/",
+      "https://github.com/saidkhanodilov"
+    ]
+  }
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- Layer 0: the 3D universe (three.js draws here) with a CSS fallback underneath -->
+  <div class="space-fallback" aria-hidden="true"></div>
+  <canvas id="space" class="space" aria-hidden="true"></canvas>
+  <div class="scanlines" aria-hidden="true"></div>
+
+  <header class="topbar" id="topbar">
+    <a class="brand" href="#hero" id="brand" aria-label="Saidmuxammadxon Odilov, back to top">
+      <span class="brand-hex" aria-hidden="true">SO</span>
+      <span class="brand-text">SAIDXON<span class="brand-os">.OS</span></span>
+    </a>
+
+    <nav class="nav" id="site-nav" aria-label="Main">
+      <ul>
+        <li><a href="#about">About</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#side-quest">Side quest</a></li>
+        <li><a href="#experience">Experience</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+
+    <div class="topbar-actions">
+      <button class="chip-btn play-chip" type="button" data-launch-game>
+        <span aria-hidden="true">🐫</span> <span class="play-chip-label">Play</span>
+      </button>
+      <button class="chip-btn trophy-chip" type="button" id="trophy-btn" aria-haspopup="dialog" aria-label="Achievements">
+        <span aria-hidden="true">🏆</span> <span id="trophy-count">0</span><span class="trophy-total">/12</span>
+      </button>
+      <button class="menu-toggle" type="button" id="menu-toggle" aria-expanded="false" aria-controls="site-nav">
+        <span class="menu-icon" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="sr-only">Menu</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Heads-up display: decorative readouts around the screen edges -->
+  <div class="hud" aria-hidden="true">
+    <span class="hud-corner hud-tl"></span><span class="hud-corner hud-tr"></span>
+    <span class="hud-corner hud-bl"></span><span class="hud-corner hud-br"></span>
+    <div class="hud-left mono">
+      <div>TASHKENT <span id="hud-time">--:--</span> · UTC+5</div>
+      <div>STATUS: <span id="hud-status">compiling ☕️</span></div>
+    </div>
+    <div class="altimeter mono">
+      <div class="alt-track"><span class="alt-fill" id="alt-fill"></span><span class="alt-target">ISS</span></div>
+      <div class="alt-readout">ALT <b id="alt-km">0</b> km</div>
+      <div class="alt-readout">V <b id="alt-v">0.0</b> km/s</div>
+    </div>
+  </div>
+
+  <main id="main">
+    <!-- ============================== HERO ============================== -->
+    <section class="hero" id="hero" aria-labelledby="hero-title">
+      <div class="wrap">
+        <p class="kicker mono reveal">// INCOMING TRANSMISSION · YEAR 2077 · TASHKENT, UZBEKISTAN</p>
+        <h1 class="hero-title reveal" id="hero-title">
+          <span class="glitch" data-text="SAIDMUXAMMADXON">Saidmuxammadxon</span>
+          <span class="hero-surname">Odilov</span>
+        </h1>
+        <p class="hero-role mono reveal" aria-label="Java backend engineer, rocket simulator, AWS Student Builder Group Leader">
+          <span class="prompt" aria-hidden="true">&gt;</span>
+          <span id="typed" aria-hidden="true">Java backend engineer</span><span class="caret" aria-hidden="true"></span>
+        </p>
+        <p class="hero-lede reveal">
+          First-year Computer Science student at Central Asian University. I build secure Java backends,
+          simulate rockets in C++, and lead the AWS Student Builder Group on campus.
+        </p>
+
+        <div class="hero-cta reveal">
+          <button class="btn btn-primary btn-launch" type="button" data-launch-game>
+            <span class="btn-emoji" aria-hidden="true">🐫</span>
+            <span>Play Silk Road 2077</span>
+          </button>
+          <a class="btn btn-ghost" href="#projects">See my projects</a>
+          <a class="btn btn-ghost" href="assets/docs/Saidmuxammadxon_Odilov_Resume.pdf" download>Resume (PDF)</a>
+        </div>
+
+        <p class="hint mono reveal">
+          <span class="hint-dot" aria-hidden="true"></span>
+          Secret route detected: my story is hidden on a 3D Silk Road. Press the camel to fly it.
+        </p>
+
+        <ul class="stats reveal" aria-label="Quick stats">
+          <li><strong data-count="1540">1540</strong><span>SAT score</span></li>
+          <li><strong data-count="7.5" data-decimals="1">7.5</strong><span>IELTS band</span></li>
+          <li><strong data-count="297">297</strong><span>Codeforces solutions in Java</span></li>
+          <li><strong data-count="63">63</strong><span>REST endpoints in LearnForFree</span></li>
+        </ul>
+      </div>
+      <a class="scroll-cue mono" href="#about"><span>Scroll to ignite</span><i aria-hidden="true"></i></a>
+    </section>
+
+    <!-- ============================== ABOUT ============================== -->
+    <section class="section" id="about" aria-labelledby="about-title">
+      <div class="wrap">
+        <header class="section-head reveal">
+          <p class="section-index mono">01 · Pilot dossier</p>
+          <h2 id="about-title">About me</h2>
+        </header>
+
+        <div class="about-grid">
+          <article class="dossier holo tilt reveal" aria-label="Pilot dossier">
+            <div class="dossier-top">
+              <div class="avatar" aria-hidden="true">
+                <span>SO</span><i class="avatar-scan"></i>
+              </div>
+              <div>
+                <p class="mono tiny dim">PILOT ID · UZ-2026-CAU-01</p>
+                <h3 class="dossier-name">Saidmuxammadxon Odilov</h3>
+                <p class="mono callsign">Callsign: SAIDXON</p>
+              </div>
+            </div>
+            <dl class="dossier-list">
+              <div><dt>Origin</dt><dd>Chelak, Samarkand Region</dd></div>
+              <div><dt>Base</dt><dd>Tashkent, Uzbekistan</dd></div>
+              <div><dt>Academy</dt><dd>Central Asian University, BSc Computer Science (2026 to 2030)</dd></div>
+              <div><dt>Class</dt><dd>Backend engineer · physics simulator</dd></div>
+              <div><dt>Languages</dt><dd>Uzbek (native) · English (IELTS 7.5)</dd></div>
+              <div><dt>Rank</dt><dd>AWS Student Builder Group Leader</dd></div>
+              <div><dt>Fuel</dt><dd>☕️ Java, the drink and the language</dd></div>
+              <div><dt>Status</dt><dd class="status-ok">Open to internships and trainee roles</dd></div>
+            </dl>
+          </article>
+
+          <div class="story holo reveal">
+            <p class="mono tiny dim">TRANSMISSION LOG · YEAR 2077 (OKAY, 2026)</p>
+            <p>
+              I grew up in <strong>Chelak</strong>, a small town near Samarkand, the city where Ulugh Beg mapped the
+              stars six hundred years ago. In high school I built websites for local educational centers, worked
+              directly with their owners, and kept the sites running on <strong>AWS EC2</strong>. That's where I learned
+              that real people depend on the things you ship.
+            </p>
+            <p>
+              Today I study Computer Science at <strong>Central Asian University</strong> in Tashkent. Most of my time
+              goes into two obsessions: making good education free (<a href="#mission-learnforfree">LearnForFree</a>)
+              and understanding how the physical world works by simulating it in code
+              (<a href="#mission-simulateuz">SimulateUz</a>).
+            </p>
+            <p>
+              Outside class I lead the <strong>AWS Student Builder Group</strong> on campus, and I brought
+              <strong>TEDxChelak Youth</strong> to my home town. I like explaining hard things simply, whether that's a
+              cloud workshop for first-years or why my rocket needed RK4 instead of Euler.
+            </p>
+
+            <figure class="meme holo">
+              <p class="meme-line"><span class="meme-who">Me:</span> "It works on my machine."</p>
+              <p class="meme-line"><span class="meme-who">Docker:</span> "Then we'll ship your machine." 📦</p>
+              <p class="meme-line"><span class="meme-who">AWS:</span> "And we'll host it in 30+ regions." 🌍</p>
+              <figcaption class="mono tiny dim">// a true story in three acts</figcaption>
+            </figure>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================== SKILLS ============================== -->
+    <section class="section" id="skills" aria-labelledby="skills-title">
+      <div class="wrap">
+        <header class="section-head reveal">
+          <p class="section-index mono">02 · Loadout</p>
+          <h2 id="skills-title">Skills &amp; tech superpowers</h2>
+          <p class="section-sub">Every pilot has a loadout. Power levels are self-assessed and slightly dramatic.</p>
+        </header>
+
+        <div class="power-grid">
+          <article class="power holo tilt reveal" data-lv="9">
+            <div class="power-head"><span class="power-icon" aria-hidden="true">☕️</span><h3>Java</h3><span class="lv mono">LV 9</span></div>
+            <div class="power-bar" role="img" aria-label="Power level 9 of 10"><i></i></div>
+            <p>My main language. 297 Codeforces solutions, a 63-endpoint Spring Boot API, and I can type <code>public static void main</code> in my sleep.</p>
+          </article>
+          <article class="power holo tilt reveal" data-lv="8">
+            <div class="power-head"><span class="power-icon" aria-hidden="true">🍃</span><h3>Spring Boot &amp; Security</h3><span class="lv mono">LV 8</span></div>
+            <div class="power-bar" role="img" aria-label="Power level 8 of 10"><i></i></div>
+            <p>REST APIs on PostgreSQL with JPA, Hibernate and Flyway. Every JWT gets checked: signature, issuer, audience, expiry. Trust no token.</p>
+          </article>
+          <article class="power holo tilt reveal" data-lv="7">
+            <div class="power-head"><span class="power-icon" aria-hidden="true">⚙️</span><h3>C++17</h3><span class="lv mono">LV 7</span></div>
+            <div class="power-bar" role="img" aria-label="Power level 7 of 10"><i></i></div>
+            <p>Physics engines with RK4 integration, a file inspector that reads real bytes instead of file names, JNI bridges to Java, CTest suites.</p>
+          </article>
+          <article class="power holo tilt reveal" data-lv="7">
+            <div class="power-head"><span class="power-icon" aria-hidden="true">☁️</span><h3>AWS</h3><span class="lv mono">LV 7</span></div>
+            <div class="power-bar" role="img" aria-label="Power level 7 of 10"><i></i></div>
+            <p>Ran client websites on EC2 in high school, lead the campus AWS Student Builder Group, and this very site is served by AWS Amplify Hosting.</p>
+          </article>
+          <article class="power holo tilt reveal" data-lv="7">
+            <div class="power-head"><span class="power-icon" aria-hidden="true">🐘</span><h3>SQL &amp; PostgreSQL</h3><span class="lv mono">LV 7</span></div>
+            <div class="power-bar" role="img" aria-label="Power level 7 of 10"><i></i></div>
+            <p>Schemas, migrations, indexes, and atomic conditional <code>UPDATE</code>s so two servers never send the same reminder twice.</p>
+          </article>
+          <article class="power holo tilt reveal" data-lv="6">
+            <div class="power-head"><span class="power-icon" aria-hidden="true">🌐</span><h3>JavaScript &amp; three.js</h3><span class="lv mono">LV 6</span></div>
+            <div class="power-bar" role="img" aria-label="Power level 6 of 10"><i></i></div>
+            <p>Ported my rocket simulator to the browser as a three.js game with 5 missions, then built this whole 3D site on top of it.</p>
+          </article>
+          <article class="power holo tilt reveal" data-lv="7">
+            <div class="power-head"><span class="power-icon" aria-hidden="true">🐳</span><h3>Docker &amp; build tools</h3><span class="lv mono">LV 7</span></div>
+            <div class="power-bar" role="img" aria-label="Power level 7 of 10"><i></i></div>
+            <p>Docker, Gradle, Maven, CMake, Git and Linux. One container image that compiles C++ and Java together and runs both test suites.</p>
+          </article>
+          <article class="power holo tilt reveal" data-lv="6">
+            <div class="power-head"><span class="power-icon" aria-hidden="true">📈</span><h3>Python &amp; numerical methods</h3><span class="lv mono">LV 6</span></div>
+            <div class="power-bar" role="img" aria-label="Power level 6 of 10"><i></i></div>
+            <p>Double pendulum chaos and Verlet orbits with NumPy and Matplotlib. Energy is conserved. My sleep schedule is not.</p>
+          </article>
+        </div>
+
+        <h3 class="sub-title mono reveal">// Special abilities</h3>
+        <div class="power-grid power-grid--special">
+          <article class="power power--special holo reveal" data-lv="9">
+            <div class="power-head"><span class="power-icon" aria-hidden="true">🎤</span><h4>Explaining things clearly</h4><span class="lv mono">LV 9</span></div>
+            <div class="power-bar" role="img" aria-label="Power level 9 of 10"><i></i></div>
+            <p>TEDx organizer, workshop host, writer of very long READMEs.</p>
+          </article>
+          <article class="power power--special holo reveal" data-lv="10">
+            <div class="power-head"><span class="power-icon" aria-hidden="true">🐛</span><h4>Reading stack traces at 2 a.m.</h4><span class="lv mono">LV ∞</span></div>
+            <div class="power-bar power-bar--overflow" role="img" aria-label="Power level over 9000"><i></i></div>
+            <p>Not a flex. A cry for help. 🫠</p>
+          </article>
+          <article class="power power--special holo reveal" data-lv="5">
+            <div class="power-head"><span class="power-icon" aria-hidden="true">🎯</span><h4>Centering a div</h4><span class="lv mono">LV 5</span></div>
+            <div class="power-bar power-bar--wobble" role="img" aria-label="Power level 5 of 10, unstable"><i></i></div>
+            <p>Unstable. Depends on the phase of the moon and whether flexbox is in a good mood.</p>
+          </article>
+        </div>
+
+        <div class="cargo reveal">
+          <p class="mono tiny dim">ALSO IN THE CARGO HOLD</p>
+          <ul class="chips">
+            <li>Spring MVC</li><li>Spring Data JPA</li><li>Hibernate</li><li>Flyway</li><li>JUnit 5</li><li>MockMvc</li>
+            <li>Supabase</li><li>LWJGL / OpenGL</li><li>JNI</li><li>HTML &amp; CSS</li><li>Bootstrap</li><li>Linux</li>
+          </ul>
+          <p class="mono tiny dim cargo-certs">CERTIFIED: Harvard CS50x · freeCodeCamp Responsive Web Design</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================== PROJECTS ============================== -->
+    <section class="section" id="projects" aria-labelledby="projects-title">
+      <div class="wrap">
+        <header class="section-head reveal">
+          <p class="section-index mono">03 · Mission log</p>
+          <h2 id="projects-title">Projects</h2>
+          <p class="section-sub">Five missions, from free education to low Earth orbit.</p>
+        </header>
+
+        <!-- Mission 01 -->
+        <article class="mission holo reveal" id="mission-learnforfree" aria-labelledby="m1-title">
+          <div class="mission-media">
+            <div class="lff-screen" aria-hidden="true">
+              <div class="lff-bar"><img src="assets/img/learnforfree-mark.svg" alt="" width="22" height="22"><b>LearnForFree</b><span class="lff-streak">🔥 streak</span></div>
+              <p class="lff-path mono">SKILL · Core Java</p>
+              <ol class="lff-units">
+                <li class="done"><span>Unit 1</span> Variables &amp; types <em>✓</em></li>
+                <li class="done"><span>Unit 2</span> Control flow <em>✓</em></li>
+                <li class="now"><span>Unit 3</span> Objects &amp; classes <em>62%</em></li>
+                <li><span>Quiz</span> Pass mark 70%</li>
+              </ol>
+              <div class="lff-progress"><i></i></div>
+              <p class="lff-foot mono">teachers publish · learners follow paths</p>
+            </div>
+          </div>
+          <div class="mission-body">
+            <p class="mission-meta mono"><span class="tag tag--live">ACTIVE</span> MISSION 01 · Oct 2026 to present · Full-stack</p>
+            <h3 id="m1-title">LearnForFree</h3>
+            <p class="mission-sub">A free learning platform where teachers publish courses and quizzes and learners follow structured learning paths.</p>
+            <ul class="mission-points">
+              <li>63-endpoint Spring Boot REST API on PostgreSQL with JPA/Hibernate and Flyway migrations.</li>
+              <li>Spring Security validates every Supabase JWT (signature, issuer, audience, expiry) and loads learner, teacher and admin roles from the database, never from token claims.</li>
+              <li>A C++17 upload inspector identifies 18 file types by their real bytes and rejects renamed executables.</li>
+              <li>Daily Web Push reminders and streaks in each learner's time zone, safe across multiple server instances.</li>
+              <li>46 JUnit tests, including MockMvc security tests and integration suites on embedded PostgreSQL 17.</li>
+            </ul>
+            <ul class="chips"><li>Java</li><li>Spring Boot</li><li>Spring Security</li><li>PostgreSQL</li><li>C++17</li><li>Docker</li></ul>
+            <p class="mission-links mono tiny dim">Source code is in a private repository. Happy to give a walkthrough.</p>
+          </div>
+        </article>
+
+        <!-- Mission 02 -->
+        <article class="mission mission--flip holo reveal" id="mission-simulateuz" aria-labelledby="m2-title">
+          <div class="mission-media">
+            <div class="shot-stack" id="shot-stack">
+              <button class="shot shot--back" type="button" aria-label="Show the orbit screenshot">
+                <img src="assets/img/simulateuz-orbit.webp" alt="SimulateUz: Earth view with the satellite in a 404 km orbit and the mission event log" width="1280" height="720" loading="lazy" decoding="async">
+              </button>
+              <button class="shot shot--front" type="button" aria-label="Show the ascent screenshot">
+                <img src="assets/img/simulateuz-ascent.webp" alt="SimulateUz: rocket ascent over Earth with telemetry for altitude, velocity and stage 2 fuel" width="1280" height="720" loading="lazy" decoding="async">
+              </button>
+            </div>
+            <p class="mono tiny dim shot-hint">Tap the screenshots to swap them.</p>
+          </div>
+          <div class="mission-body">
+            <p class="mission-meta mono"><span class="tag tag--done">COMPLETE</span> MISSION 02 · Oct 2026 · Simulation</p>
+            <h3 id="m2-title">SimulateUz: 3D satellite launch simulator</h3>
+            <p class="mission-sub">Flies a rocket from the Baikonur launch pad to a 400 km orbit and deploys a satellite, rendered live in 3D.</p>
+            <ul class="mission-points">
+              <li>C++17 physics engine with J2 gravity, atmospheric drag, pressure-dependent thrust, staging and fixed-step RK4 integration.</li>
+              <li>Closed-loop ascent guidance and a Hohmann transfer that reaches a 398 × 404 km, 51.61° orbit against a 400 km, 51.6° target, checked by an automated test that flies the full mission.</li>
+              <li>Real-time OpenGL 3.3 rendering in Java (LWJGL) calling the C++ core through JNI, with up to 1000× time warp and a logarithmic depth buffer from 0.5 m to 10 million km.</li>
+              <li>Ported to a three.js browser game, Road to Orbit, with 5 missions and an autopilot verified by headless Node.js tests.</li>
+            </ul>
+            <ul class="chips"><li>C++17</li><li>Java</li><li>JNI</li><li>OpenGL</li><li>JavaScript</li><li>three.js</li></ul>
+            <p class="mission-links"><a class="link-arrow" href="https://github.com/saidkhanodilov/SimulateUz" target="_blank" rel="noopener">Source on GitHub</a></p>
+          </div>
+        </article>
+
+        <div class="mission-row">
+          <!-- Mission 03 -->
+          <article class="mission mission--small holo tilt reveal" id="mission-codeforces" aria-labelledby="m3-title">
+            <div class="verdicts mono" aria-hidden="true">
+              <p><span>4A</span> Watermelon <b class="ac">Accepted</b></p>
+              <p><span>546A</span> Soldier and Bananas <b class="ac">Accepted</b></p>
+              <p><span>281A</span> Word Capitalization <b class="ac">Accepted</b></p>
+              <p><span>1914A</span> Problemsolving Log <b class="ac">Accepted</b></p>
+              <p><span>????</span> Every problem, first try <b class="wa">Wrong answer on test 2</b></p>
+            </div>
+            <p class="mission-meta mono"><span class="tag tag--live">ONGOING</span> MISSION 03 · Java · Algorithms</p>
+            <h3 id="m3-title">Codeforces practice</h3>
+            <p>297 competitive programming solutions in Java, kept in a public repository to track my progress in algorithms and data structures. "Wrong answer on test 2" is my villain origin story.</p>
+            <p class="mission-links"><a class="link-arrow" href="https://github.com/saidkhanodilov/codeforces-practice" target="_blank" rel="noopener">View repository</a></p>
+          </article>
+
+          <!-- Mission 04 -->
+          <article class="mission mission--small holo tilt reveal" aria-labelledby="m4-title">
+            <div class="plots">
+              <img src="assets/img/double-pendulum.webp" alt="Double pendulum trajectories: a small 10 degree start stays regular while a 120 degree start becomes chaotic" width="1200" height="659" loading="lazy" decoding="async">
+              <img src="assets/img/orbital-motion.webp" alt="Orbit trajectories for three launch speeds: one closed orbit and two escape paths" width="1200" height="842" loading="lazy" decoding="async">
+            </div>
+            <p class="mission-meta mono"><span class="tag tag--done">COMPLETE</span> MISSION 04 · Engineering Physics · Python</p>
+            <h3 id="m4-title">Chaos and orbits</h3>
+            <p>A double pendulum with Midpoint Euler that measures how fast two runs 10⁻⁸ rad apart diverge, and 2D orbits with a hand-written velocity Verlet integrator that checks energy conservation and convergence order.</p>
+            <ul class="chips"><li>Python</li><li>NumPy</li><li>Matplotlib</li><li>Numerical methods</li></ul>
+          </article>
+
+          <!-- Mission 05 -->
+          <article class="mission mission--small mission--here holo tilt reveal" aria-labelledby="m5-title">
+            <div class="here-badge mono" aria-hidden="true"><span class="here-ping"></span>YOU ARE HERE</div>
+            <p class="mission-meta mono"><span class="tag tag--live">LIVE</span> MISSION 05 · Oct 2026 · Web + AWS</p>
+            <h3 id="m5-title">Silk Road 2077 (this site)</h3>
+            <p>Built from scratch with HTML, CSS, JavaScript and three.js, including a playable 3D game. Deployed on AWS Amplify Hosting with continuous deployment from GitHub: every push goes live worldwide within a couple of minutes.</p>
+            <ul class="chips"><li>three.js</li><li>WebGL</li><li>AWS Amplify</li><li>CloudFront CDN</li></ul>
+            <p class="mission-links"><a class="link-arrow" href="https://github.com/saidkhanodilov/silk-road-2077" target="_blank" rel="noopener">Source on GitHub</a></p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================== SIDE QUEST (creative feature) ============================== -->
+    <section class="section" id="side-quest" aria-labelledby="quest-title">
+      <div class="wrap">
+        <div class="quest holo reveal">
+          <div class="quest-copy">
+            <p class="section-index mono">04 · Side quest</p>
+            <h2 id="quest-title">Silk Road 2077</h2>
+            <p>
+              It's the year 2077 and the Silk Road runs through hyperspace. Pilot <strong>Chelak-1</strong>, a
+              two-humped Bactrian-class freighter, through the five cities of my story. Every city connects the
+              scientists who made it famous to something I built.
+            </p>
+            <p class="mono tiny dim">Collect ☕️ Java beans · dodge 🐛 NullPointerExceptions · about 90 seconds · works on phones</p>
+            <div class="quest-cta">
+              <button class="btn btn-primary btn-launch" type="button" data-launch-game>
+                <span class="btn-emoji" aria-hidden="true">🐫</span><span>Launch the caravan</span>
+              </button>
+              <button class="btn btn-ghost" type="button" data-launch-game="text">Read it as text instead</button>
+            </div>
+          </div>
+
+          <ol class="route-map" aria-label="Route of the Silk Road 2077 journey">
+            <li><span class="route-dot" aria-hidden="true"></span><b>Chelak</b><span>Where it started: first websites, kept alive on AWS EC2, and TEDxChelak Youth.</span></li>
+            <li><span class="route-dot" aria-hidden="true"></span><b>Samarkand</b><span>Ulugh Beg mapped the stars here. I simulate rockets to orbit.</span></li>
+            <li><span class="route-dot" aria-hidden="true"></span><b>Bukhara</b><span>Ibn Sina read his way through its library. LearnForFree keeps knowledge free.</span></li>
+            <li><span class="route-dot" aria-hidden="true"></span><b>Khiva</b><span>Al-Khwarizmi gave us the word "algorithm". I practice them daily.</span></li>
+            <li><span class="route-dot" aria-hidden="true"></span><b>Tashkent</b><span>Central Asian University and the AWS Student Builder Group.</span></li>
+            <li><span class="route-dot route-dot--cloud" aria-hidden="true"></span><b>The Cloud</b><span>Next stop: your team?</span></li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================== EXPERIENCE ============================== -->
+    <section class="section" id="experience" aria-labelledby="exp-title">
+      <div class="wrap">
+        <header class="section-head reveal">
+          <p class="section-index mono">05 · Crew record</p>
+          <h2 id="exp-title">Experience &amp; leadership</h2>
+        </header>
+
+        <div class="exp-grid">
+          <ol class="timeline">
+            <li class="reveal">
+              <p class="mono tiny dim">2026 to present · Central Asian University</p>
+              <h3>AWS Student Builder Group Leader</h3>
+              <p>Selected by AWS to lead the campus Student Builder Group and launch hands-on cloud workshops for students.</p>
+            </li>
+            <li class="reveal">
+              <p class="mono tiny dim">Chelak, Uzbekistan · TEDx</p>
+              <h3>Licensee and Organizer, TEDxChelak Youth</h3>
+              <p>Obtained an official license from TED to organize a TED-format event for young people in my home town.</p>
+            </li>
+            <li class="reveal">
+              <p class="mono tiny dim">During high school · Self-employed</p>
+              <h3>Freelance Web Developer</h3>
+              <p>Built responsive websites for educational centers in HTML, CSS and Bootstrap, working directly with the owners, then deployed and maintained them on AWS EC2.</p>
+            </li>
+          </ol>
+
+          <aside class="edu holo tilt reveal" aria-labelledby="edu-title">
+            <p class="mono tiny dim">ACADEMY</p>
+            <h3 id="edu-title">Central Asian University</h3>
+            <p>BSc Computer Science · Sep 2026 to Jun 2030 (expected)</p>
+            <p class="dim">Coursework: Computer Programming (C++), Calculus, Physics</p>
+            <ul class="edu-stats">
+              <li><b>1540</b><span>SAT</span></li>
+              <li><b>7.5</b><span>IELTS</span></li>
+            </ul>
+            <p class="mono tiny dim">CERTIFICATIONS</p>
+            <ul class="edu-certs">
+              <li><b>Harvard CS50x</b> Introduction to Computer Science</li>
+              <li><b>freeCodeCamp</b> Responsive Web Design</li>
+            </ul>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================== CONTACT ============================== -->
+    <section class="section section--contact" id="contact" aria-labelledby="contact-title">
+      <div class="wrap">
+        <div class="comms holo reveal">
+          <p class="section-index mono">06 · Comms</p>
+          <h2 id="contact-title">Open a comms channel</h2>
+          <p class="comms-lede">
+            I'm looking for internships and trainee roles in software engineering. I'm always happy to talk about Java,
+            cloud, physics, or why camels make excellent spaceships.
+          </p>
+          <div class="comms-grid">
+            <a class="comms-card" href="mailto:saidxonodilov47@gmail.com">
+              <span class="comms-icon" aria-hidden="true">✉️</span><span><b>Email</b><small>saidxonodilov47<wbr>@gmail.com</small></span>
+            </a>
+            <a class="comms-card" href="https://www.linkedin.com/in/saidmuxammadxon-odilov/" target="_blank" rel="noopener">
+              <span class="comms-icon" aria-hidden="true">💼</span><span><b>LinkedIn</b><small>saidmuxammadxon-odilov</small></span>
+            </a>
+            <a class="comms-card" href="https://github.com/saidkhanodilov" target="_blank" rel="noopener">
+              <span class="comms-icon" aria-hidden="true">🐙</span><span><b>GitHub</b><small>saidkhanodilov</small></span>
+            </a>
+            <a class="comms-card" href="assets/docs/Saidmuxammadxon_Odilov_Resume.pdf" download>
+              <span class="comms-icon" aria-hidden="true">📄</span><span><b>Resume</b><small>PDF, one page</small></span>
+            </a>
+          </div>
+          <p class="mono tiny dim comms-meme">Average reply time: faster than a cold Gradle build. Low bar, I know.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <p>© 2026 Saidmuxammadxon Odilov · Made in Tashkent with three.js, too much coffee, and AWS Amplify.</p>
+      <p class="mono tiny dim">No camels were harmed in the making of this website. Psst: ↑ ↑ ↓ ↓ ← → ← → B A</p>
+      <a class="mono tiny" href="#hero">Back to launch pad ↑</a>
+    </div>
+  </footer>
+
+  <!-- ============================== GAME OVERLAY ============================== -->
+  <div class="game" id="game" role="dialog" aria-modal="true" aria-labelledby="game-title" hidden>
+    <div class="game-stage" id="game-stage"></div>
+
+    <div class="game-hud">
+      <ol class="game-route mono" id="game-route" aria-label="Journey progress"></ol>
+      <div class="game-score mono" aria-live="off">
+        <span title="Java beans collected">☕️ <b id="g-beans">0</b></span>
+        <span title="Bugs hit">🐛 <b id="g-bugs">0</b></span>
+      </div>
+      <div class="game-actions">
+        <button type="button" class="g-btn" id="g-sound" aria-pressed="false" aria-label="Sound off">🔇</button>
+        <button type="button" class="g-btn" id="g-pause" aria-label="Pause">⏸</button>
+        <button type="button" class="g-btn" id="g-skip" aria-label="Skip to the next city">⏭</button>
+        <button type="button" class="g-btn g-btn--exit" id="g-exit" aria-label="Exit the game">✕</button>
+      </div>
+    </div>
+
+    <div class="game-touch" id="game-touch">
+      <button type="button" class="touch-btn" data-steer="-1" aria-label="Steer left">◀</button>
+      <button type="button" class="touch-btn" data-steer="1" aria-label="Steer right">▶</button>
+    </div>
+
+    <section class="game-panel" id="g-intro" aria-labelledby="game-title">
+      <p class="mono tiny dim">SIDE QUEST · YEAR 2077</p>
+      <h2 id="game-title">Silk Road 2077</h2>
+      <p>The Silk Road runs through hyperspace now. You're flying <b>Chelak-1</b>, a Bactrian-class freighter: two humps, zero bugs (hopefully). Visit the five cities of my story and find out what each one has to do with me.</p>
+      <ul class="controls mono">
+        <li><kbd>←</kbd> <kbd>→</kbd> or <kbd>A</kbd> <kbd>D</kbd> steer</li>
+        <li>Phone: tap the arrows or swipe</li>
+        <li><kbd>P</kbd> pause · <kbd>Esc</kbd> exit</li>
+      </ul>
+      <p class="mono tiny">Collect ☕️ Java beans. Dodge 🐛 NullPointerExceptions.</p>
+      <div class="panel-cta">
+        <button type="button" class="btn btn-primary" id="g-start">Launch 🚀</button>
+        <button type="button" class="btn btn-ghost" id="g-text-btn">Read it as text</button>
+      </div>
+    </section>
+
+    <section class="game-panel game-panel--station" id="g-station" hidden aria-live="polite"></section>
+    <section class="game-panel game-panel--end" id="g-end" hidden aria-live="polite"></section>
+    <section class="game-panel game-panel--text" id="g-text" hidden></section>
+    <div class="game-flash" id="g-flash" aria-hidden="true"></div>
+    <div class="game-pop mono" id="g-pop" aria-hidden="true"></div>
+  </div>
+
+  <!-- Achievements -->
+  <dialog class="trophies" id="trophies" aria-labelledby="trophies-title">
+    <div class="trophies-inner">
+      <header class="trophies-head">
+        <h2 id="trophies-title">Achievements</h2>
+        <p class="mono tiny dim"><span id="trophies-progress">0 of 12</span> unlocked · saved in this browser</p>
+      </header>
+      <ul class="trophy-list" id="trophy-list"></ul>
+      <form method="dialog"><button class="btn btn-ghost" type="submit">Close</button></form>
+    </div>
+  </dialog>
+
+  <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+
+  <noscript>
+    <p class="noscript mono">The 3D scene and the game need JavaScript. Everything else on this page works without it.</p>
+  </noscript>
+</body>
+</html>
