@@ -1,0 +1,12 @@
+version: 1
+frontend:
+  phases:
+    build:
+      commands:
+        # Plain HTML, CSS and JavaScript: there is nothing to compile.
+        # Amplify publishes the public/ folder exactly as it is in the repo.
+        - echo "Silk Road 2077 is a static site. Shipping ./public as is."
+  artifacts:
+    baseDirectory: public
+    files:
+      - '**/*'
