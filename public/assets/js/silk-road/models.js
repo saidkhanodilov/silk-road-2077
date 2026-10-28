@@ -240,6 +240,63 @@ export function createBugGeometry() {
   return mergeParts(parts);
 }
 
+/** The IAM policy power-up: an AWS-orange shield with a check mark. Faces +Z. */
+export function createShieldGeometry() {
+  const outline = (s) => {
+    const sh = new THREE.Shape();
+    sh.moveTo(-0.52 * s, 0.56 * s);
+    sh.lineTo(0.52 * s, 0.56 * s);
+    sh.lineTo(0.52 * s, 0.08 * s);
+    sh.quadraticCurveTo(0.48 * s, -0.42 * s, 0, -0.72 * s);
+    sh.quadraticCurveTo(-0.48 * s, -0.42 * s, -0.52 * s, 0.08 * s);
+    sh.closePath();
+    return sh;
+  };
+  const slab = (s, depth) => new THREE.ExtrudeGeometry(outline(s), {
+    depth, bevelEnabled: true, bevelThickness: 0.04, bevelSize: 0.04, bevelSegments: 2, curveSegments: 10,
+  });
+  return mergeParts([
+    { geo: slab(1, 0.16), color: 0xff9900, matrix: mat(0, 0, -0.08) },
+    { geo: slab(0.74, 0.1), color: 0x232f3e, matrix: mat(0, 0.03, 0.06) },
+    { geo: new THREE.BoxGeometry(0.12, 0.25, 0.08), color: 0xffffff, matrix: mat(-0.14, -0.06, 0.22, 0, 0, 0.73) },
+    { geo: new THREE.BoxGeometry(0.12, 0.5, 0.08), color: 0xffffff, matrix: mat(0.09, 0.03, 0.22, 0, 0, -0.67) },
+  ]);
+}
+
+/** A soft force field around the ship while the IAM policy is active. */
+export function createShieldBubble() {
+  const bubble = new THREE.Mesh(
+    new THREE.SphereGeometry(1, 32, 18),
+    new THREE.ShaderMaterial({
+      transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+      uniforms: { uTime: { value: 0 }, uAlpha: { value: 0 }, uColor: { value: new THREE.Color(0xff9900) } },
+      vertexShader: /* glsl */`
+        varying vec3 vN; varying vec3 vV; varying vec3 vP;
+        void main() {
+          vec4 mv = modelViewMatrix * vec4(position, 1.0);
+          vN = normalize(normalMatrix * normal); vV = normalize(-mv.xyz); vP = position;
+          gl_Position = projectionMatrix * mv;
+        }`,
+      fragmentShader: /* glsl */`
+        uniform float uTime; uniform float uAlpha; uniform vec3 uColor;
+        varying vec3 vN; varying vec3 vV; varying vec3 vP;
+        void main() {
+          float rim = pow(1.0 - abs(dot(vN, vV)), 3.0);
+          // faint hexagon-ish cells drifting over the surface
+          vec2 cell = abs(fract(vec2(atan(vP.x, vP.z) * 3.0, vP.y * 5.0 - uTime * 0.6)) - 0.5);
+          float lines = smoothstep(0.42, 0.5, max(cell.x, cell.y));
+          float a = (rim * 0.75 + lines * 0.12) * uAlpha * 0.8;
+          gl_FragColor = vec4(uColor, a);
+        }`,
+    }),
+  );
+  bubble.scale.set(2.2, 1.25, 2.3);
+  bubble.position.y = 0.15;
+  bubble.renderOrder = 2;
+  bubble.visible = false;
+  return bubble;
+}
+
 /** Soft round glow texture for halos and sparks. */
 export function makeGlowTexture(size = 128) {
   const c = document.createElement('canvas');

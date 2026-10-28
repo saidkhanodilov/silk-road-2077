@@ -61,4 +61,6 @@ export const sfx = {
   station() { if (!enabled) return; [523, 659, 784, 1047].forEach((f, i) => tone(f, i * 0.09, 0.22, 'triangle', 0.35)); },
   launch() { if (!enabled) return; tone(120, 0, 0.9, 'sawtooth', 0.25, 520); noise(0, 0.6, 0.15); },
   finish() { if (!enabled) return; [392, 523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, i * 0.1, 0.35, 'triangle', 0.32)); },
+  shield() { if (!enabled) return; [440, 660, 990].forEach((f, i) => tone(f, i * 0.07, 0.3, 'triangle', 0.3, f * 1.5)); },
+  block() { if (!enabled) return; tone(1400, 0, 0.18, 'square', 0.18, 500); noise(0, 0.12, 0.2); tone(220, 0.04, 0.25, 'triangle', 0.3); },
 };

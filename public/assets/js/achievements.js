@@ -13,6 +13,8 @@ export const ACHIEVEMENTS = [
   { id: 'silk-road', icon: '🏁', title: 'Silk Road complete', desc: 'Visited all five cities and reached the Cloud.' },
   { id: 'beans', icon: '☕️', title: 'Bean counter', desc: 'Collected 25 Java beans in one run.' },
   { id: 'bug-magnet', icon: '🐛', title: 'Bug magnet', desc: 'Hit 5 bugs in one run. Very realistic.' },
+  { id: 'clean-code', icon: '🧼', title: 'Clean code', desc: 'Collected 15 Java beans in a row without hitting a bug.' },
+  { id: 'least-privilege', icon: '🛡️', title: 'Least privilege', desc: 'Blocked a bug with the IAM policy power-up.' },
   { id: 'konami', icon: '🎮', title: 'Konami commander', desc: 'Entered the Konami code. Meme mode engaged.' },
   { id: 'curious', icon: '🔍', title: 'Curious clicker', desc: 'Clicked the logo five times and found a dev secret.' },
 ];
@@ -34,6 +36,7 @@ function save() {
 function render() {
   if (!els) return;
   els.count.textContent = String(unlocked.size);
+  els.total.textContent = `/${ACHIEVEMENTS.length}`;
   els.progress.textContent = `${unlocked.size} of ${ACHIEVEMENTS.length}`;
   els.list.replaceChildren(...ACHIEVEMENTS.map((a) => {
     const li = document.createElement('li');
@@ -113,6 +116,7 @@ export function isUnlocked(id) {
 export function initAchievements() {
   els = {
     count: document.getElementById('trophy-count'),
+    total: document.querySelector('.trophy-total'),
     progress: document.getElementById('trophies-progress'),
     list: document.getElementById('trophy-list'),
     toasts: document.getElementById('toasts'),

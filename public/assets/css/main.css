@@ -602,6 +602,20 @@ main, .footer { position: relative; z-index: 1; }
 .g-btn:hover { border-color: var(--cyan); }
 .g-btn--exit:hover { border-color: var(--red); }
 
+/* Journey progress line under the HUD, with a dot per city and the camel flying along it */
+.game-progress {
+  position: absolute; z-index: 3; top: calc(64px + env(safe-area-inset-top)); left: max(16px, env(safe-area-inset-left)); right: max(16px, env(safe-area-inset-right));
+  height: 3px; border-radius: 3px; background: rgba(110, 190, 255, 0.16); pointer-events: none; opacity: 0; transition: opacity 0.3s;
+}
+.game.is-playing .game-progress { opacity: 1; }
+.game-progress i {
+  position: absolute; inset: 0; border-radius: inherit; transform-origin: left; transform: scaleX(var(--p, 0));
+  background: linear-gradient(90deg, var(--gold), var(--cyan)); box-shadow: 0 0 8px rgba(62, 232, 255, 0.55);
+}
+.game-progress b { position: absolute; top: 50%; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; border-radius: 50%; background: #0b1026; border: 2px solid rgba(163, 179, 211, 0.6); }
+.game-progress b.is-done { background: var(--gold); border-color: var(--gold); box-shadow: 0 0 8px rgba(255, 190, 85, 0.7); }
+.gp-camel { position: absolute; top: 50%; left: calc(var(--p, 0) * 100%); font-size: 15px; line-height: 1; transform: translate(-50%, -58%) scaleX(-1); filter: drop-shadow(0 0 6px rgba(255, 190, 85, 0.8)); }
+
 .game-touch { position: absolute; left: 0; right: 0; bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 3; display: none; justify-content: space-between; padding: 0 16px; pointer-events: none; }
 .touch-btn { pointer-events: auto; width: 76px; height: 76px; border-radius: 50%; border: 1px solid var(--line-strong); background: rgba(10, 16, 40, 0.55); font-size: 1.6rem; color: var(--cyan); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
 .touch-btn:active { background: rgba(62, 232, 255, 0.25); }
@@ -661,6 +675,9 @@ kbd { display: inline-block; min-width: 26px; padding: 2px 6px; border-radius: 6
 .end-stats b { display: block; font-family: var(--font-display); font-size: 1.5rem; color: var(--cyan); }
 .end-stats span { font-size: 0.75rem; color: var(--muted); }
 .end-rank { font-family: var(--font-display); color: var(--gold); font-size: 1.1rem; }
+.end-rank-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; }
+.end-rank-row .end-rank { margin: 0; }
+.btn-small { min-height: 36px; padding: 6px 14px; font-size: 0.85rem; }
 
 .game-panel--text { width: min(94vw, 760px); max-height: calc(100% - 90px); }
 .text-station { padding: 16px 0; border-top: 1px dashed var(--line); }
@@ -672,6 +689,7 @@ kbd { display: inline-block; min-width: 26px; padding: 2px 6px; border-radius: 6
 .game-pop.is-on { animation: pop 1.3s ease forwards; }
 .game-pop.is-bug { color: var(--red); }
 .game-pop.is-bean { color: var(--gold); }
+.game-pop.is-shield { color: #ff9900; }
 @keyframes pop { 0% { opacity: 0; transform: translate(-50%, 10px) scale(0.9); } 15% { opacity: 1; transform: translate(-50%, 0) scale(1.05); } 80% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -16px); } }
 .game-loading { position: absolute; inset: 0; display: grid; place-items: center; z-index: 5; font-family: var(--font-mono); color: var(--cyan); font-size: 0.9rem; letter-spacing: 0.1em; }
 
@@ -702,7 +720,7 @@ kbd { display: inline-block; min-width: 26px; padding: 2px 6px; border-radius: 6
 @media (max-width: 640px) {
   :root { --topbar-h: 58px; }
   .toasts { right: auto; left: 50%; transform: translateX(-50%); bottom: calc(14px + env(safe-area-inset-bottom)); }
-  .game:not([hidden]) ~ .toasts { top: 64px; bottom: auto; }
+  .game:not([hidden]) ~ .toasts { top: 80px; bottom: auto; }
   .toast { padding: 9px 12px; gap: 10px; }
   .toast small { font-size: 0.74rem; }
   body { font-size: 1rem; }

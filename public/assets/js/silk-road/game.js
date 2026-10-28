@@ -3,7 +3,8 @@
 
 import * as THREE from '../../vendor/three.min.js';
 import {
-  createCamelShip, createCity, createGate, createCupGeometry, createBugGeometry, makeGlowTexture, cssColor,
+  createCamelShip, createCity, createGate, createCupGeometry, createBugGeometry, createShieldGeometry, createShieldBubble,
+  makeGlowTexture, cssColor,
 } from './models.js';
 import { STATIONS, BUG_MESSAGES, BEAN_MESSAGES, rankFor } from './stations.js';
 import { sfx } from '../sfx.js';
@@ -16,6 +17,7 @@ const ROW_GAP = 17;
 const GATE_CLEAR = 40;
 const STOP_AHEAD = 52; // the station card opens with the city gate this far ahead
 const GATE_AT = SEG_LEN.reduce((acc, len) => [...acc, (acc[acc.length - 1] || 0) + len], []);
+const JOURNEY = GATE_AT[GATE_AT.length - 1] - STOP_AHEAD; // distance flown when the last card opens
 const MAX_ITEMS = 72;
 const PYLON_GAP = 12;
 const PYLON_ROWS = 22;
@@ -27,13 +29,22 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
     sound: $('#g-sound'), pause: $('#g-pause'), skip: $('#g-skip'), exit: $('#g-exit'),
     intro: $('#g-intro'), start: $('#g-start'), textBtn: $('#g-text-btn'),
     station: $('#g-station'), end: $('#g-end'), text: $('#g-text'),
-    flash: $('#g-flash'), pop: $('#g-pop'), touch: $('#game-touch'),
+    flash: $('#g-flash'), pop: $('#g-pop'), touch: $('#game-touch'), progress: $('#g-progress'),
   };
   root.tabIndex = -1;
+
+  // Journey progress: a dot for each city along a thin line under the HUD, and a camel flying along it.
+  const ticks = STATIONS.map((st, i) => {
+    const b = document.createElement('b');
+    b.style.left = `${((GATE_AT[i] - STOP_AHEAD) / JOURNEY) * 100}%`;
+    return b;
+  });
+  els.progress.append(...ticks);
 
   const S = {
     mode: 'idle', visited: 0, world: 0, distSinceRow: 0, speed: BASE_SPEED, camBlend: 0, introT: 0, snapLens: false,
     lane: 1, shipX: 0, beans: 0, bugs: 0, flightTime: 0, slowTimer: 0, shake: 0, lastRowBugs: 0,
+    shield: false, streak: 0,
   };
   let lastFocus = null;
   let gl = null; // three.js state, created on first launch
@@ -62,28 +73,28 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
 
     const glowTex = makeGlowTexture();
 
-    // Sky dome
-    const sky = new THREE.Mesh(
-      new THREE.SphereGeometry(700, 32, 16),
-      new THREE.ShaderMaterial({
-        side: THREE.BackSide, depthWrite: false, fog: false,
-        vertexShader: /* glsl */`
-          varying vec3 vDir;
-          void main() { vDir = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
-        fragmentShader: /* glsl */`
-          varying vec3 vDir;
-          void main() {
-            float h = vDir.y;
-            vec3 horizon = vec3(0.62, 0.14, 0.42);
-            vec3 mid = vec3(0.16, 0.04, 0.24);
-            vec3 zenith = vec3(0.01, 0.015, 0.05);
-            vec3 col = mix(horizon, mid, smoothstep(-0.01, 0.10, h));
-            col = mix(col, zenith, smoothstep(0.10, 0.55, h));
-            col = mix(col, vec3(0.03, 0.01, 0.05), smoothstep(0.0, -0.15, h));
-            gl_FragColor = vec4(col, 1.0);
-          }`,
-      }),
-    );
+    // Sky dome. Its horizon takes on the color of the city ahead (see updateTint).
+    const skyMat = new THREE.ShaderMaterial({
+      side: THREE.BackSide, depthWrite: false, fog: false,
+      uniforms: { uHorizon: { value: new THREE.Color(0.62, 0.14, 0.42) }, uMid: { value: new THREE.Color(0.16, 0.04, 0.24) } },
+      vertexShader: /* glsl */`
+        varying vec3 vDir;
+        void main() { vDir = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+      fragmentShader: /* glsl */`
+        uniform vec3 uHorizon; uniform vec3 uMid;
+        varying vec3 vDir;
+        void main() {
+          float h = vDir.y;
+          vec3 horizon = uHorizon;
+          vec3 mid = uMid;
+          vec3 zenith = vec3(0.01, 0.015, 0.05);
+          vec3 col = mix(horizon, mid, smoothstep(-0.01, 0.10, h));
+          col = mix(col, zenith, smoothstep(0.10, 0.55, h));
+          col = mix(col, vec3(0.03, 0.01, 0.05), smoothstep(0.0, -0.15, h));
+          gl_FragColor = vec4(col, 1.0);
+        }`,
+    });
+    const sky = new THREE.Mesh(new THREE.SphereGeometry(700, 32, 16), skyMat);
     sky.renderOrder = -2;
     scene.add(sky);
 
@@ -160,12 +171,12 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
     // Neon ground and the road
     const groundMat = new THREE.ShaderMaterial({
       fog: false,
-      uniforms: { uOffset: { value: 0 }, uFog: { value: fogColor } },
+      uniforms: { uOffset: { value: 0 }, uFog: { value: fogColor }, uGrid: { value: new THREE.Color(0.95, 0.22, 0.8) } },
       vertexShader: /* glsl */`
         varying vec3 vW;
         void main() { vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }`,
       fragmentShader: /* glsl */`
-        uniform float uOffset; uniform vec3 uFog;
+        uniform float uOffset; uniform vec3 uFog; uniform vec3 uGrid;
         varying vec3 vW;
         void main() {
           vec2 coord = vec2(vW.x / 5.0, (vW.z - uOffset) / 5.0);
@@ -180,7 +191,7 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
           float dist = -vW.z;
           float fade = 1.0 - smoothstep(25.0, 228.0, dist);
           vec3 col = mix(vec3(0.02, 0.008, 0.045), vec3(0.06, 0.02, 0.10), road);
-          col += vec3(0.95, 0.22, 0.8) * grid * 0.55 * (1.0 - road * 0.7);
+          col += uGrid * grid * 0.55 * (1.0 - road * 0.7);
           col += vec3(1.0, 0.74, 0.32) * edge * 1.3;
           col += vec3(0.24, 0.9, 1.0) * lane * 0.85;
           col = mix(uFog, col, fade);
@@ -217,6 +228,10 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
     );
     for (const m of [cups, bugs, halos]) { m.frustumCulled = false; scene.add(m); }
     for (let i = 0; i < MAX_ITEMS; i++) halos.setColorAt(i, gold);
+    // The rare IAM policy power-up (at most one on the road) and the force field it gives the ship
+    const shieldItem = new THREE.Mesh(createShieldGeometry(), new THREE.MeshBasicMaterial({ vertexColors: true }));
+    shieldItem.visible = false;
+    scene.add(shieldItem);
 
     // Sparks for collected beans
     const SPARKS = 90;
@@ -235,10 +250,13 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
 
     const ship = createCamelShip();
     scene.add(ship.group);
+    const bubble = createShieldBubble();
+    ship.group.add(bubble);
 
     gl = {
-      renderer, scene, camera, groundMat, pylonPosts, pylonTops, pylonZ, cups, bugs, halos, gold,
-      red: new THREE.Color(0xff3b55), sparks: { geo: sparkGeo, pos: sparkPos, col: sparkCol, vel: sparkVel, life: sparkLife, n: SPARKS, next: 0 },
+      renderer, scene, camera, groundMat, pylonPosts, pylonTops, pylonZ, cups, bugs, halos, gold, shieldItem, bubble,
+      skyMat, ridgeMat, sunGlow, red: new THREE.Color(0xff3b55), orange: new THREE.Color(0xff9900),
+      tintKey: '', progress: -1, sparks: { geo: sparkGeo, pos: sparkPos, col: sparkCol, vel: sparkVel, life: sparkLife, n: SPARKS, next: 0 },
       ship, holders: [], items: Array.from({ length: MAX_ITEMS }, () => ({ active: false })),
       dummy: new THREE.Object3D(), zero: new THREE.Matrix4().makeScale(0, 0, 0), time: 0, raf: 0, last: 0,
       camDist: 7.4, camY: 3.1, lens: 0, lensX: 0, panelRight: 0, vw: 1, vh: 1, portrait: false,
@@ -333,6 +351,12 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
   function spawnRow(z) {
     const lane = Math.floor(Math.random() * 3);
     const other = (l) => (l + 1 + Math.floor(Math.random() * 2)) % 3;
+    // After the first city, a rare IAM policy power-up: it blocks the next bug.
+    if (S.visited > 0 && !S.shield && Math.random() < 0.05 && !gl.items.some((x) => x.active && x.type === 'shield')) {
+      addItem('shield', lane, z);
+      S.lastRowBugs = 0;
+      return;
+    }
     const r = Math.random();
     const allowDouble = S.visited > 0 && S.lastRowBugs === 0;
     if (r < 0.55) {
@@ -381,6 +405,7 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
 
   // `here` marks the city whose card is open; otherwise the next stop is highlighted.
   function renderRoute(here = -1) {
+    ticks.forEach((b, i) => b.classList.toggle('is-done', i < S.visited));
     els.route.replaceChildren(...STATIONS.map((s, i) => {
       const li = document.createElement('li');
       li.textContent = s.name;
@@ -410,8 +435,9 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
     clearWorld();
     Object.assign(S, {
       visited: 0, world: 0, distSinceRow: 0, speed: BASE_SPEED, lane: 1, shipX: 0,
-      beans: 0, bugs: 0, flightTime: 0, slowTimer: 0, shake: 0, lastRowBugs: 0,
+      beans: 0, bugs: 0, flightTime: 0, slowTimer: 0, shake: 0, lastRowBugs: 0, shield: false, streak: 0,
     });
+    gl.progress = -1;
     spawnStation(0, -GATE_AT[0]);
     for (let z = -46; z > SPAWN_Z; z -= ROW_GAP) spawnRow(z);
     renderRoute();
@@ -551,7 +577,10 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
         el('div', '', [el('b', '', String(S.bugs)), el('span', '', 'bugs hit')]),
         el('div', '', [el('b', '', fmtTime(S.flightTime)), el('span', '', 'flight time')]),
       ]),
-      el('p', 'end-rank', `Rank: ${rankFor(S.beans, S.bugs)}`),
+      el('div', 'end-rank-row', [
+        el('p', 'end-rank', `Rank: ${rankFor(S.beans, S.bugs)}`),
+        button('Share my rank ↗', 'btn btn-ghost btn-small', shareRank),
+      ]),
       el('div', 'station-links', [
         portfolioLink('#contact', 'Contact me ✉️', 'btn btn-primary'),
         button('Fly again 🔁', 'btn btn-ghost', startRun),
@@ -559,6 +588,24 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
       ]),
     );
     els.end.querySelector('.btn-primary').setAttribute('data-contact', '');
+  }
+
+  async function shareRank(e) {
+    const btn = e.currentTarget;
+    const url = `${location.origin}${location.pathname}`;
+    const text = `I flew Silk Road 2077 on Saidmuxammadxon's portfolio: ${S.beans} Java beans, ${S.bugs} bugs, `
+      + `${fmtTime(S.flightTime)} flight time. Rank: ${rankFor(S.beans, S.bugs)}. Can you beat it?`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: 'Silk Road 2077', text, url });
+        return;
+      }
+      await navigator.clipboard.writeText(`${text} ${url}`);
+      btn.textContent = 'Copied to clipboard ✓';
+    } catch (err) {
+      if (err && err.name === 'AbortError') return; // the share sheet was closed
+      btn.textContent = 'Sharing is blocked here, sorry';
+    }
   }
 
   function showText() {
@@ -610,6 +657,8 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
     }
     clearWorld();
     S.visited = 0;
+    S.world = 0;
+    S.shield = false;
     S.lane = 1;
     S.shipX = 0;
     S.camBlend = 0;
@@ -621,6 +670,42 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
     showOnly(els.intro);
     startLoop();
     els.start.focus({ preventScroll: true });
+  }
+
+  // Every city has its own sky. As you enter a city's airspace (the last stretch of road
+  // before it), the horizon, fog, grid, mountain ridges and sun glow change to its palette.
+  const sky = (horizon, mid, fog, grid, ridge) => ({
+    horizon: new THREE.Color(...horizon), mid: new THREE.Color(...mid), fog: new THREE.Color(...fog),
+    grid: new THREE.Color(...grid), ridge: new THREE.Color(ridge),
+  });
+  const NEON = sky([0.62, 0.14, 0.42], [0.16, 0.04, 0.24], [0.40, 0.09, 0.33], [0.95, 0.22, 0.80], 0xff4fd2);
+  const SKIES = {
+    chelak: sky([0.78, 0.30, 0.22], [0.20, 0.06, 0.16], [0.42, 0.13, 0.16], [1.00, 0.55, 0.30], 0xffa040), // sunset orange
+    samarkand: sky([0.10, 0.42, 0.52], [0.03, 0.10, 0.20], [0.06, 0.22, 0.30], [0.18, 0.95, 0.85], 0x2fe6d0), // turquoise tiles
+    bukhara: sky([0.32, 0.26, 0.78], [0.08, 0.06, 0.26], [0.17, 0.13, 0.42], [0.48, 0.58, 1.00], 0x7d95ff), // lapis
+    khiva: NEON, // desert neon
+    tashkent: sky([0.10, 0.38, 0.66], [0.03, 0.08, 0.22], [0.05, 0.18, 0.36], [0.24, 0.88, 1.00], 0x3ee8ff), // city night
+    cloud: sky([0.62, 0.68, 0.88], [0.20, 0.24, 0.42], [0.36, 0.40, 0.56], [0.78, 0.92, 1.00], 0xc8f4ff), // above the clouds
+  };
+  const SUN_GLOW = new THREE.Color(0xff5aa8);
+  function updateTint() {
+    const g = gl;
+    const k = Math.min(S.visited, STATIONS.length - 1);
+    const start = k === 0 ? 0 : GATE_AT[k - 1] - STOP_AHEAD;
+    const end = GATE_AT[k] - STOP_AHEAD;
+    const x = Math.min(Math.max(((S.world - start) / (end - start) - 0.55) / 0.4, 0), 1);
+    const f = x * x * (3 - 2 * x);
+    const key = `${k}:${f.toFixed(3)}`;
+    if (key === g.tintKey) return;
+    g.tintKey = key;
+    const a = k === 0 ? NEON : SKIES[STATIONS[k - 1].id];
+    const b = SKIES[STATIONS[k].id];
+    g.skyMat.uniforms.uHorizon.value.copy(a.horizon).lerp(b.horizon, f);
+    g.skyMat.uniforms.uMid.value.copy(a.mid).lerp(b.mid, f);
+    g.scene.fog.color.copy(a.fog).lerp(b.fog, f);
+    g.groundMat.uniforms.uGrid.value.copy(a.grid).lerp(b.grid, f);
+    g.ridgeMat.color.copy(a.ridge).lerp(b.ridge, f);
+    g.sunGlow.material.color.copy(SUN_GLOW).lerp(g.ridgeMat.color, 0.35);
   }
 
   /* ================================================================== */
@@ -699,6 +784,7 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
 
     // items: move, collide, draw
     const targetX = LANES[S.lane];
+    let shieldShown = false;
     for (let i = 0; i < g.items.length; i++) {
       const it = g.items[i];
       if (it.active && S.mode === 'playing') {
@@ -708,12 +794,27 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
           it.active = false;
           if (it.type === 'bean') {
             S.beans++;
+            S.streak++;
             emitSparks(it.x, 1.1, 0, g.gold);
             sfx.bean();
             if (S.beans % 10 === 0) pop(BEAN_MESSAGES[Math.floor(Math.random() * BEAN_MESSAGES.length)], 'bean');
             if (S.beans >= 25) unlock('beans');
+            if (S.streak >= 15) unlock('clean-code');
+          } else if (it.type === 'shield') {
+            S.shield = true;
+            emitSparks(it.x, 1.1, 0, g.orange, 18);
+            sfx.shield();
+            pop('🛡️ IAM policy attached: Deny bug:*', 'shield');
+          } else if (S.shield) {
+            S.shield = false;
+            g.bubble.material.uniforms.uAlpha.value = 2.2; // flare, then fade out
+            emitSparks(it.x, 1.1, 0, g.orange, 24);
+            sfx.block();
+            pop('🛡️ AccessDenied: bug blocked', 'shield');
+            unlock('least-privilege');
           } else {
             S.bugs++;
+            S.streak = 0;
             S.slowTimer = 0.9;
             S.shake = reduceMotion ? 0 : 0.5;
             emitSparks(it.x, 1.1, 0, g.red, 20);
@@ -735,7 +836,14 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
       }
       const bob = Math.sin(t * 3 + it.phase) * 0.15;
       g.dummy.position.set(it.x, 1.05 + bob, it.z);
-      if (it.type === 'bean') {
+      if (it.type === 'shield') {
+        shieldShown = true;
+        g.shieldItem.position.set(it.x, 1.25 + bob, it.z);
+        g.shieldItem.rotation.set(0, Math.sin(t * 2 + it.phase) * 0.55, Math.sin(t * 1.3) * 0.08);
+        g.shieldItem.scale.setScalar(1.3);
+        g.cups.setMatrixAt(i, g.zero);
+        g.bugs.setMatrixAt(i, g.zero);
+      } else if (it.type === 'bean') {
         g.dummy.rotation.set(0.25, t * 2.2 + it.phase, 0);
         g.dummy.scale.setScalar(1.15);
         g.dummy.updateMatrix();
@@ -753,8 +861,9 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
       g.dummy.scale.setScalar(it.type === 'bean' ? 2.6 : 3);
       g.dummy.updateMatrix();
       g.halos.setMatrixAt(i, g.dummy.matrix);
-      g.halos.setColorAt(i, it.type === 'bean' ? g.gold : g.red);
+      g.halos.setColorAt(i, it.type === 'bean' ? g.gold : it.type === 'bug' ? g.red : g.orange);
     }
+    g.shieldItem.visible = shieldShown;
     g.cups.instanceMatrix.needsUpdate = true;
     g.bugs.instanceMatrix.needsUpdate = true;
     g.halos.instanceMatrix.needsUpdate = true;
@@ -780,6 +889,21 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
     }
     sp.geo.attributes.position.needsUpdate = true;
     sp.geo.attributes.color.needsUpdate = true;
+
+    // the IAM force field
+    const bu = g.bubble.material.uniforms;
+    bu.uTime.value = reduceMotion ? 0 : t;
+    bu.uAlpha.value += ((S.shield ? 1 : 0) - bu.uAlpha.value) * Math.min(dt * 4, 1);
+    g.bubble.visible = bu.uAlpha.value > 0.01;
+
+    updateTint();
+    if (S.mode === 'playing') {
+      const prog = Math.min(S.world / JOURNEY, 1);
+      if (Math.abs(prog - g.progress) > 0.001) {
+        g.progress = prog;
+        els.progress.style.setProperty('--p', prog.toFixed(4));
+      }
+    }
 
     // arrival at the next gate
     if (S.mode === 'playing' && S.visited < GATE_AT.length && GATE_AT[S.visited] - S.world <= STOP_AHEAD) arrive(S.visited);
