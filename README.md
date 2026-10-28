@@ -4,10 +4,17 @@
 
 It's a 3D, slightly fictional, slightly meme-powered website. My story is hidden on a Silk Road in the year 2077, and you can fly it in a two-humped camel spaceship.
 
-**Live site:** _deploying on AWS Amplify Hosting (link coming here)_
-**Built for:** the AWS student portfolio hackathon, hosted on AWS Amplify Hosting
+- **Live site:** _deploying on AWS Amplify Hosting (link coming here)_
+- **Built for:** the AWS student portfolio hackathon, hosted on AWS Amplify Hosting
 
 ![The hero: my name in neon beside a dot-matrix Earth with a beacon on Tashkent](docs/screenshots/desktop-hero.jpg)
+
+## Try it in a minute
+
+1. Open the live site. The globe shows the real day and night, right now.
+2. Press **Play Silk Road 2077**, then **Launch 🚀**. Steer with ← → or swipes, grab ☕ Java beans and dodge 🐛 bugs.
+3. At each city, read how a scientist from there connects to something I built, then press **Fly to …**. In a hurry? ⏭ skips to the next city.
+4. At The Cloud, get your rank and share it. **Esc** takes you back to the page at any time.
 
 ---
 
