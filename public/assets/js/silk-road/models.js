@@ -507,7 +507,7 @@ export function createCity(id, color) {
         const s = i % 2 ? 1 : -1;
         add(P.box(s * (12 + i * 2.6), -14 + i * 4.2, 2.2, 2.2, 2.2, i, 2 + (i % 3) * 3));
       }
-      extras.push({ label: 'Next stop: your team?', x: 0, y: 14, z: -20, height: 2 });
+      extras.push({ label: 'Next stop: your team?', x: 0, y: 19.5, z: -12, height: 2 });
       break;
     }
     default:

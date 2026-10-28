@@ -571,10 +571,10 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
     els.end.style.setProperty('--city', cssColor(st.color));
     els.end.classList.add('game-panel--station');
     els.end.replaceChildren(
-      el('p', 'station-kicker', [el('span', '', 'FINAL DESTINATION · JOURNEY COMPLETE'), el('span', '', '🏁')]),
+      el('p', 'station-kicker', [el('span', '', 'FINAL STOP · JOURNEY COMPLETE'), el('span', '', '🏁')]),
       el('h2', '', st.name),
       el('p', 'station-tagline', st.tagline),
-      ...stationBlocks(st),
+      // The score comes first: it's the payoff, and it stays clear of the sticky buttons below.
       el('div', 'end-stats', [
         el('div', '', [el('b', '', String(S.beans)), el('span', '', 'Java beans')]),
         el('div', '', [el('b', '', String(S.bugs)), el('span', '', 'bugs hit')]),
@@ -584,6 +584,7 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
         el('p', 'end-rank', `Rank: ${rankFor(S.beans, S.bugs)}`),
         button('Share my rank ↗', 'btn btn-ghost btn-small', shareRank),
       ]),
+      ...stationBlocks(st),
       el('div', 'station-links', [
         portfolioLink('#contact', 'Contact me ✉️', 'btn btn-primary'),
         button('Fly again 🔁', 'btn btn-ghost', startRun),

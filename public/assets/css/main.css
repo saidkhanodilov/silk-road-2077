@@ -591,7 +591,7 @@ main, .footer { position: relative; z-index: 1; }
   padding: calc(10px + env(safe-area-inset-top)) 14px 10px; background: linear-gradient(rgba(2, 3, 10, 0.85), transparent);
 }
 .game-route { display: flex; gap: 6px; flex: 1; min-width: 0; overflow: hidden; font-size: 0.68rem; letter-spacing: 0.08em; }
-.game-route li { padding: 5px 9px; border-radius: 999px; border: 1px solid var(--line); color: var(--dim); white-space: nowrap; }
+.game-route li { padding: 5px 9px; border-radius: 999px; border: 1px solid var(--line); color: var(--dim); white-space: nowrap; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .game-route li.is-done { color: var(--gold); border-color: rgba(255, 190, 85, 0.5); }
 .game-route li.is-next, .game-route li.is-here { color: #04050d; background: var(--cyan); border-color: var(--cyan); box-shadow: var(--glow-cyan); }
 .game-route li.is-here { background: var(--gold); border-color: var(--gold); box-shadow: 0 0 16px rgba(255, 190, 85, 0.55); }
@@ -638,6 +638,7 @@ main, .footer { position: relative; z-index: 1; }
 @keyframes panel-in-up { from { opacity: 0; transform: translate(-50%, 24px); } }
 @media (min-width: 900px) {
   .game-panel:not(.game-panel--text) { left: clamp(24px, 5vw, 90px); transform: translateY(-50%); animation-name: panel-in-side; width: min(46vw, 540px); }
+  #g-end { width: min(48vw, 600px); } /* room for all three final buttons on one row */
 }
 @media (max-width: 640px) {
   .game-panel:not(.game-panel--text) { --pad: 18px; top: auto; bottom: calc(12px + env(safe-area-inset-bottom)); transform: translateX(-50%); animation-name: panel-in-up; max-height: 66vh; }
@@ -671,13 +672,12 @@ kbd { display: inline-block; min-width: 26px; padding: 2px 6px; border-radius: 6
   .game-panel .station-links .btn, #g-intro .panel-cta .btn { min-height: 44px; padding: 10px 16px; font-size: 0.95rem; }
 }
 
-.end-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 16px 0; }
+.end-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 0 0 12px; }
 .end-stats div { padding: 12px; border-radius: 12px; border: 1px solid var(--line); text-align: center; background: rgba(255, 255, 255, 0.03); }
 .end-stats b { display: block; font-family: var(--font-display); font-size: 1.5rem; color: var(--cyan); }
 .end-stats span { font-size: 0.75rem; color: var(--muted); }
-.end-rank { font-family: var(--font-display); color: var(--gold); font-size: 1.1rem; }
-.end-rank-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; }
-.end-rank-row .end-rank { margin: 0; }
+.end-rank-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; margin-bottom: 16px; }
+.end-rank-row .end-rank { margin: 0; font-family: var(--font-display); color: var(--gold); font-size: 1.1rem; }
 .btn-small { min-height: 36px; padding: 6px 14px; font-size: 0.85rem; }
 
 .game-panel--text { width: min(94vw, 760px); max-height: calc(100% - 90px); }
@@ -735,10 +735,22 @@ kbd { display: inline-block; min-width: 26px; padding: 2px 6px; border-radius: 6
   .dossier-list > div { grid-template-columns: 1fr; gap: 2px; }
   .comms-grid { grid-template-columns: 1fr; }
   .lff-screen { transform: none; }
-  .game-route li:not(.is-next):not(.is-here) { display: none; }
-  .game-hud { gap: 8px; padding-inline: 10px; }
+  .game-route li { padding: 5px 7px; letter-spacing: 0.04em; }
+  .game-hud { gap: 6px; padding-inline: 10px; }
+  .game-score { gap: 10px; }
+  .game-actions { gap: 4px; }
   .g-btn { width: 36px; height: 36px; }
+  .end-stats div { padding: 10px 6px; }
   .end-stats b { font-size: 1.2rem; }
+  .end-stats span { font-size: 0.72rem; }
+}
+/* Below this width the six city chips don't fit beside the HUD buttons, so only the current one shows. */
+@media (max-width: 820px) {
+  .game-route li:not(.is-next):not(.is-here) { display: none; }
+}
+@media (max-width: 360px) {
+  .game-panel .station-links { gap: 8px; }
+  .game-panel .station-links .btn, #g-intro .panel-cta .btn { padding: 9px 12px; font-size: 0.88rem; }
 }
 
 /* Phones held sideways: the hero text leaves room for the globe, the game cards sit on the left
@@ -755,14 +767,21 @@ kbd { display: inline-block; min-width: 26px; padding: 2px 6px; border-radius: 6
   .game-panel h2 { font-size: 1.3rem; margin: 2px 0 6px; }
   .game-panel p { font-size: 0.9rem; }
   .game-panel .controls { font-size: 0.76rem; gap: 4px; margin-bottom: 8px; }
-  .station-kicker { font-size: 0.68rem; margin-bottom: 4px; }
-  .station-tagline { font-size: 0.8rem; margin-bottom: 10px; }
+  .game-panel .tiny, .game-panel .station-kicker { font-size: 0.68rem; }
+  .game-panel .station-kicker { margin-bottom: 4px; }
+  .game-panel .station-tagline { font-size: 0.8rem; margin-bottom: 10px; }
   .station-block { padding: 8px 12px; margin-bottom: 8px; }
   .station-block p { font-size: 0.88rem; }
-  .end-stats { margin: 10px 0; }
-  .end-stats div { padding: 8px; }
-  .end-stats b { font-size: 1.15rem; }
-  .game-panel .station-links .btn, #g-intro .panel-cta .btn { min-height: 44px; padding: 9px 14px; font-size: 0.9rem; }
+  /* The final card is wider, with one-line stats, so the rank, share button and all three actions fit. */
+  #g-end { width: min(62vw, 540px); }
+  .end-stats { margin-bottom: 8px; }
+  .end-stats div { display: flex; align-items: baseline; justify-content: center; gap: 6px; padding: 6px 4px; }
+  .end-stats b { font-size: 1rem; }
+  .end-stats span { font-size: 0.7rem; }
+  .end-rank-row { margin-bottom: 10px; }
+  .end-rank-row .end-rank { font-size: 0.95rem; }
+  .game-panel .station-links { gap: 8px; }
+  .game-panel .station-links .btn, #g-intro .panel-cta .btn { min-height: 44px; padding: 8px 12px; font-size: 0.85rem; }
   .game-touch { bottom: calc(10px + env(safe-area-inset-bottom)); padding-inline: max(16px, env(safe-area-inset-left)) max(16px, env(safe-area-inset-right)); }
   .touch-btn { width: 66px; height: 66px; }
   .game-hud { padding-left: max(14px, env(safe-area-inset-left)); padding-right: max(14px, env(safe-area-inset-right)); }
