@@ -1,11 +1,10 @@
-// The 3D universe behind the page: a dot-matrix Earth with a beacon on Tashkent,
-// a satellite on a 51.6° orbit (the SimulateUz target), girih stars, and a camel
-// spaceship that flies past every now and then.
+// The 3D universe behind the page: a dot-matrix Earth with a beacon on Tashkent, lit by
+// where the sun really is right now, a satellite on a 51.6° orbit (the SimulateUz target),
+// girih stars, and a camel spaceship that flies past every now and then.
 
 import * as THREE from '../vendor/three.min.js';
 import { createCamelShip, createGirihStar, makeGlowTexture, makeLabel } from './silk-road/models.js';
-
-const TASHKENT = { lat: 41.31, lon: 69.24 };
+import { TASHKENT, subsolarPoint } from './sun.js';
 
 function latLonToVec3(lat, lon, r) {
   const phi = ((lon + 180) / 360) * Math.PI * 2;
@@ -88,12 +87,22 @@ export async function initHero(canvas, { reduceMotion = false } = {}) {
   earthGroup.add(earthSpin);
   earthGroup.rotation.z = 0.32; // axial tilt, roughly
 
-  const landTex = await new THREE.TextureLoader().loadAsync(new URL('../img/earth-land-mask.png', import.meta.url).href);
-  landTex.minFilter = THREE.LinearFilter;
-  landTex.generateMipmaps = false;
+  // Two small maps: where the land is, and where the cities are (night lights, made from real
+  // city populations by tools/globe/night_lights.py).
+  const loader = new THREE.TextureLoader();
+  const [landTex, lightsTex] = await Promise.all(['earth-land-mask.png', 'earth-lights.png'].map(async (file) => {
+    const tex = await loader.loadAsync(new URL(`../img/${file}`, import.meta.url).href);
+    tex.minFilter = THREE.LinearFilter;
+    tex.generateMipmaps = false;
+    return tex;
+  }));
 
   const earthMat = new THREE.ShaderMaterial({
-    uniforms: { uLand: { value: landTex }, uSunDir: { value: new THREE.Vector3(0.6, 0.45, 0.65).normalize() } },
+    uniforms: {
+      uLand: { value: landTex },
+      uLights: { value: lightsTex },
+      uSunDir: { value: new THREE.Vector3(0.6, 0.45, 0.65).normalize() },
+    },
     vertexShader: /* glsl */`
       varying vec2 vUv; varying vec3 vNormalW; varying vec3 vViewDir;
       void main() {
@@ -104,7 +113,7 @@ export async function initHero(canvas, { reduceMotion = false } = {}) {
         gl_Position = projectionMatrix * viewMatrix * wp;
       }`,
     fragmentShader: /* glsl */`
-      uniform sampler2D uLand; uniform vec3 uSunDir;
+      uniform sampler2D uLand; uniform sampler2D uLights; uniform vec3 uSunDir;
       varying vec2 vUv; varying vec3 vNormalW; varying vec3 vViewDir;
       void main() {
         float rows = 130.0;
@@ -115,14 +124,26 @@ export async function initHero(canvas, { reduceMotion = false } = {}) {
         vec2 f = fract(cell) - 0.5;
         vec2 center = (floor(cell) + 0.5) / vec2(cols, rows);
         float land = texture2D(uLand, center).r;
+        float lights = texture2D(uLights, center).r;
         float dotMask = smoothstep(0.34, 0.16, length(f));
 
-        float light = clamp(dot(vNormalW, uSunDir) * 0.7 + 0.45, 0.12, 1.0);
+        // uSunDir points at the real sun, so the lit half is wherever it's daytime right now.
+        float sunDot = dot(vNormalW, uSunDir);
+        float day = smoothstep(-0.08, 0.14, sunDot);
+        float light = mix(0.32, 0.62 + 0.45 * max(sunDot, 0.0), day);
         float fres = pow(1.0 - max(dot(vNormalW, vViewDir), 0.0), 2.4);
 
-        vec3 col = vec3(0.012, 0.025, 0.07);
-        col += vec3(0.22, 0.78, 1.0) * dotMask * land * light * 1.15;
-        col += vec3(0.10, 0.22, 0.55) * dotMask * (1.0 - land) * 0.10 * light;
+        vec3 dots = vec3(0.22, 0.78, 1.0) * land * light * 1.15;
+        dots += vec3(0.10, 0.22, 0.55) * (1.0 - land) * 0.10 * light;
+        // Sunrise and sunset: land along the terminator turns gold.
+        float dusk = exp(-sunDot * sunDot / 0.005);
+        dots = mix(dots, vec3(1.0, 0.62, 0.25) * 0.85, land * dusk * 0.6);
+        // After dark, the cities light up.
+        float city = smoothstep(0.1, 0.75, lights) * (1.0 - day);
+        dots = mix(dots, vec3(1.0, 0.66, 0.3) * (0.4 + 0.85 * lights), city);
+
+        vec3 col = vec3(0.012, 0.025, 0.07) + dots * dotMask;
+        col += vec3(1.0, 0.31, 0.82) * dusk * 0.05; // a faint pink line along the terminator
 
         vec2 gUv = vec2(vUv.x * 24.0, vUv.y * 12.0);
         vec2 g = abs(fract(gUv - 0.5) - 0.5) / fwidth(gUv);
@@ -139,14 +160,21 @@ export async function initHero(canvas, { reduceMotion = false } = {}) {
   const atmosphere = new THREE.Mesh(
     new THREE.SphereGeometry(R * 1.14, 64, 40),
     new THREE.ShaderMaterial({
+      uniforms: { uSunDir: earthMat.uniforms.uSunDir }, // shared, so both follow the sun
       vertexShader: /* glsl */`
-        varying vec3 vNormal;
-        void main() { vNormal = normalize(normalMatrix * normal); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+        varying vec3 vNormal; varying vec3 vNormalW;
+        void main() {
+          vNormal = normalize(normalMatrix * normal);
+          vNormalW = normalize(mat3(modelMatrix) * normal);
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }`,
       fragmentShader: /* glsl */`
-        varying vec3 vNormal;
+        uniform vec3 uSunDir;
+        varying vec3 vNormal; varying vec3 vNormalW;
         void main() {
           float i = pow(clamp(0.68 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 0.0, 1.0), 2.6);
-          gl_FragColor = vec4(0.25, 0.7, 1.0, 1.0) * i * 1.6;
+          float lit = 0.5 + 0.7 * smoothstep(-0.35, 0.55, dot(vNormalW, uSunDir)); // brighter on the sunny edge
+          gl_FragColor = vec4(0.25, 0.7, 1.0, 1.0) * i * 1.6 * lit;
         }`,
       side: THREE.BackSide, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false,
     }),
@@ -182,6 +210,22 @@ export async function initHero(canvas, { reduceMotion = false } = {}) {
   const azimuth = Math.atan2(beaconPos.x, beaconPos.z);
   const baseSpin = -0.35 - azimuth;
   earthSpin.rotation.y = baseSpin;
+
+  // The sun's direction from the Earth, in the globe's own frame. It's worked out again every
+  // minute, and turned with the spinning globe every frame, so day and night stay on the right
+  // countries however the globe is turned.
+  const sunLocal = new THREE.Vector3();
+  const spinQuat = new THREE.Quaternion();
+  let sunAt = -Infinity;
+  function updateSun() {
+    const now = Date.now();
+    if (Math.abs(now - sunAt) > 60000) {
+      sunAt = now;
+      const { lat, lon } = subsolarPoint(now);
+      sunLocal.copy(latLonToVec3(lat, lon, 1));
+    }
+    earthMat.uniforms.uSunDir.value.copy(sunLocal).applyQuaternion(earthSpin.getWorldQuaternion(spinQuat));
+  }
 
   // Satellite on a 51.6° orbit (the SimulateUz target orbit)
   const orbit = new THREE.Group();
@@ -350,6 +394,7 @@ export async function initHero(canvas, { reduceMotion = false } = {}) {
     const mz = layout.z + (away.z - layout.z) * h;
     earthGroup.position.set(mx + (finale.x - mx) * endP, my + (finale.y - my) * endP, mz + (finale.z - mz) * endP);
     earthSpin.rotation.y = baseSpin + t * 0.035 + scrollP * 2.2;
+    updateSun();
 
     // satellite
     satAngle += dt * 0.32;

@@ -153,6 +153,7 @@ main, .footer { position: relative; z-index: 1; }
 }
 .sysbar div { overflow: hidden; text-overflow: ellipsis; }
 .sysbar span { color: var(--cyan); }
+.sysbar #hud-sky { color: var(--gold); }
 @media (min-width: 1200px), (min-width: 700px) and (max-width: 960px) {
   .sysbar { display: block; }
 }

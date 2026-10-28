@@ -2,6 +2,7 @@
 // and lazy loading of the 3D scene and the Silk Road 2077 game.
 
 import { initAchievements, unlock, toast } from './achievements.js';
+import { TASHKENT, isDaytime } from './sun.js';
 
 const root = document.documentElement;
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -60,8 +61,13 @@ function initNav() {
 /* ---------- HUD: Tashkent clock, status memes, altimeter ---------- */
 function initHud() {
   const timeEl = $('#hud-time');
+  const skyEl = $('#hud-sky');
   const fmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Tashkent', hour: '2-digit', minute: '2-digit' });
-  const tick = () => { timeEl.textContent = fmt.format(new Date()); };
+  const sunUp = () => isDaytime(TASHKENT.lat, TASHKENT.lon);
+  const tick = () => {
+    timeEl.textContent = fmt.format(new Date());
+    skyEl.textContent = sunUp() ? '☀' : '☾';
+  };
   tick();
   setInterval(tick, 15000);
 
@@ -69,10 +75,15 @@ function initHud() {
     'compiling ☕️', 'it works on my machine ✓', 'warming up the JVM…', 'fixing a bug I wrote 5 minutes ago',
     'downloading more RAM', 'rebasing on main (scared)', 'deploying to AWS Amplify 🚀', 'feeding the camel 🐫',
     'reading the docs (for once)', 'git push --force-with-lease',
+    () => (sunUp() ? 'sun is up in Tashkent ☀' : 'night in Tashkent, replies after breakfast 🌙'),
   ];
   const statusEl = $('#hud-status');
   let s = 0;
-  setInterval(() => { s = (s + 1) % statuses.length; statusEl.textContent = statuses[s]; }, 5200);
+  setInterval(() => {
+    s = (s + 1) % statuses.length;
+    const next = statuses[s];
+    statusEl.textContent = typeof next === 'function' ? next() : next;
+  }, 5200);
 
   const fill = $('#alt-fill');
   const km = $('#alt-km');

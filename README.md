@@ -53,13 +53,16 @@ The game never gets in the way of the portfolio:
 
 ### Small things to find
 
+- **The globe shows the real day and night.** The lit half is wherever the sun is up right now, worked out from your clock, with a gold band along sunrise and sunset. After dark, the cities light up, placed from the populations of over 7,000 cities and towns. Visit in the evening (Tashkent time) and Uzbekistan glows amber under the beacon.
 - 14 achievements, saved in your browser (the 🏆 counter in the top bar). One of them is for 15 Java beans in a row without a single bug.
-- A status bar with the current time in Tashkent and a rotating developer status ("it works on my machine ✓"), and an altimeter that climbs from 0 to the ISS (400 km) as you scroll.
+- A status bar with the current time in Tashkent, a ☀ or ☾ for whether the sun is up there ("night in Tashkent, replies after breakfast 🌙"), a rotating developer status ("it works on my machine ✓"), and an altimeter that climbs from 0 to the ISS (400 km) as you scroll.
 - A satellite circling the globe on a 51.6° orbit, the same target orbit SimulateUz flies to.
 - A camel spaceship that flies past every now and then.
 - The Konami code (↑ ↑ ↓ ↓ ← → ← → B A) turns on meme mode.
 - A custom 404 page for caravans that get lost.
 - Add the site to your phone's home screen and it gets its own app icon, named SAIDXON.OS.
+
+![The same view of the globe at 11:00 and at 20:00 in Tashkent: all cyan by day; by night the land dims and India, China and Europe light up in amber](docs/screenshots/globe-day-night.jpg)
 
 ## On phones
 
@@ -99,7 +102,8 @@ The repo carries its own hosting configuration:
 - **Content first.** All About, Skills, Projects, Experience and Contact content is static HTML, so it works without JavaScript, for screen readers, and for search engines. JavaScript only adds the 3D layer and the game on top.
 - **Text before 3D.** The 3D globe starts only after the page has painted, so the text shows up first. The game is a separate module that's only downloaded when you press the camel.
 - **Adapts to slow devices.** If the 3D globe can't hold about 40 frames per second, it drops to a lower resolution, and then to 30 frames per second. Add `?hq` to the address to turn this off.
-- **3D on a budget.** The globe is one sphere with a custom shader that draws the continents as dots from an 8 KB land mask. Coffee cups, bugs and road lights are instanced meshes, the cities are merged geometries, and rendering pauses while the tab is hidden or the game is open.
+- **A real sky.** [`sun.js`](public/assets/js/sun.js) works out where the sun is overhead from the date and time (the Astronomical Almanac's short formulas, accurate to about a degree), and the globe's shader lights that half. The night lights come from [Natural Earth](https://www.naturalearthdata.com)'s populated places: [`tools/globe/night_lights.py`](tools/globe/night_lights.py) turns each city into a glow as bright as its population and saves a 16 KB map.
+- **3D on a budget.** The globe is one sphere with a custom shader that draws the continents as dots from an 8 KB land mask and the 16 KB lights map. Coffee cups, bugs and road lights are instanced meshes, the cities are merged geometries, and rendering pauses while the tab is hidden or the game is open.
 - **Accessible by default.** Skip link, semantic landmarks, visible focus styles, a focus trap and Esc to close in the game, a full text mode, and support for `prefers-reduced-motion` (the 3D background holds still, and the game drops camera shake and the intro camera swing). An axe-core scan finds no violations on the page, the game cards or the text mode, and Lighthouse scores 100 for accessibility, best practices and SEO.
 
 ```
@@ -110,13 +114,15 @@ public/                        the deployed site
 ├── assets/css/main.css        design system, layout, game UI
 ├── assets/js/main.js          navigation, status bar, easter eggs
 ├── assets/js/hero-scene.js    the 3D globe, satellite, stars and flyby
+├── assets/js/sun.js           where the sun is right now (day and night)
 ├── assets/js/achievements.js  the 14 achievements
 ├── assets/js/sfx.js           sound effects (off until you turn them on)
 ├── assets/js/silk-road/       the game: flow, 3D models, station content
-├── assets/img/                project images, the globe's land mask, app icons
+├── assets/img/                project images, the globe's maps, app icons
 ├── assets/vendor/             trimmed three.js (MIT)
 └── assets/fonts/              Orbitron, Space Grotesk, JetBrains Mono (OFL)
 tools/three/                   rebuilds the trimmed three.js (not deployed)
+tools/globe/                   makes the globe's night-lights map (not deployed)
 amplify.yml                    Amplify build settings
 customHttp.yml                 security and cache headers
 ```
@@ -137,7 +143,7 @@ Then open http://localhost:8080.
 
 - 3D: [three.js](https://threejs.org) (MIT license, see `public/assets/vendor/THREE_LICENSE.txt`).
 - Fonts: Orbitron, Space Grotesk and JetBrains Mono, all under the SIL Open Font License (see `public/assets/fonts/LICENSES.txt`).
-- Coastlines for the globe's land mask: [Natural Earth](https://www.naturalearthdata.com) (public domain), via the world-atlas package.
+- Coastlines for the globe's land mask: [Natural Earth](https://www.naturalearthdata.com) (public domain), via the world-atlas package. City populations for its night lights: Natural Earth's populated places (public domain).
 - Built with help from Claude Code, an AI coding assistant, as a pair programmer.
 
 ## Contact
