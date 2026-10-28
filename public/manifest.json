@@ -1,0 +1,15 @@
+{
+  "name": "Saidmuxammadxon Odilov · Silk Road 2077",
+  "short_name": "SAIDXON.OS",
+  "description": "Portfolio of Saidmuxammadxon Odilov: Java backends, rocket simulators, and a camel spaceship on a 3D Silk Road.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#04050d",
+  "theme_color": "#04050d",
+  "icons": [
+    { "src": "assets/img/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/img/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/img/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
