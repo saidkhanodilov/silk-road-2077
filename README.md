@@ -26,6 +26,15 @@ You pilot **Chelak-1**, a Bactrian-class freighter (two humps, zero bugs, hopefu
 | **Tashkent** | Capital of Uzbekistan, where I live now | CS at Central Asian University and the campus AWS Student Builder Group |
 | **The Cloud** | Final destination | This site on AWS, and an invitation to get in touch |
 
+On the way:
+
+- **An IAM policy power-up.** After the first city, an orange shield sometimes appears on the road. Fly into it and an AccessDenied bubble wraps the camel, and the next bug that hits you is blocked. Least privilege, finally useful.
+- **Every city has its own sky.** As you get close to a city, the horizon, fog, grid and mountains fade into its colors: sunset orange for Chelak, turquoise tiles for Samarkand, lapis for Bukhara, desert neon for Khiva, a blue city night for Tashkent, and a pale sky above the clouds.
+- **A progress line** under the top bar, with a dot for each city and a tiny camel moving along it.
+- **A rank at the end.** The Cloud shows your beans, bugs and flight time, and gives you a rank, from "Intern (unpaid, but happy)" to "Senior Bean Engineer". **Share my rank** opens your device's share sheet, or copies a brag to the clipboard where sharing isn't available.
+
+![Five cities, five skies: Chelak, Samarkand, Bukhara, Khiva and Tashkent](docs/screenshots/game-skies.jpg)
+
 The game never gets in the way of the portfolio:
 
 - It's optional. Every fact in the game is also in the normal page, in plain HTML.
@@ -34,22 +43,25 @@ The game never gets in the way of the portfolio:
 - It works with a keyboard (← → or A D, P to pause), touch buttons, or swipes on a phone.
 - Every station card links to the matching section of the portfolio.
 
-| Flying | A station | The finish |
-| --- | --- | --- |
-| ![Flying the camel spaceship down the neon road](docs/screenshots/game-play.jpg) | ![The Samarkand station card next to a hologram Registan](docs/screenshots/game-station-samarkand.jpg) | ![The Cloud: score, rank and contact buttons](docs/screenshots/game-end.jpg) |
+| Flying | The IAM policy shield |
+| --- | --- |
+| ![Flying the camel spaceship down the neon road](docs/screenshots/game-play.jpg) | ![The camel inside an orange AccessDenied bubble, with the journey progress line at the top](docs/screenshots/game-shield.jpg) |
+| **A station** | **The finish** |
+| ![The Samarkand station card next to a hologram Registan](docs/screenshots/game-station-samarkand.jpg) | ![The Cloud: score, rank, share button and contact buttons](docs/screenshots/game-end.jpg) |
 
 ### Small things to find
 
-- 12 achievements, saved in your browser (the 🏆 counter in the top bar).
-- A HUD with the current time in Tashkent, a rotating developer status ("it works on my machine ✓"), and an altimeter that climbs from 0 to the ISS (400 km) as you scroll.
+- 14 achievements, saved in your browser (the 🏆 counter in the top bar). One of them is for 15 Java beans in a row without a single bug.
+- A status bar with the current time in Tashkent and a rotating developer status ("it works on my machine ✓"), and an altimeter that climbs from 0 to the ISS (400 km) as you scroll.
 - A satellite circling the globe on a 51.6° orbit, the same target orbit SimulateUz flies to.
 - A camel spaceship that flies past every now and then.
 - The Konami code (↑ ↑ ↓ ↓ ← → ← → B A) turns on meme mode.
 - A custom 404 page for caravans that get lost.
+- Add the site to your phone's home screen and it gets its own app icon, named SAIDXON.OS.
 
 ## On phones
 
-The whole site and the game are built for touch screens: the layout is single-column, the 3D scene renders fewer stars, the game shows big arrow buttons, and the city cards slide up from the bottom so the 3D scene stays visible.
+The whole site and the game are built for touch screens: the layout is single-column, the 3D scene renders fewer stars, the game shows big arrow buttons, and the city cards slide up from the bottom so the 3D scene stays visible. Held sideways, the cards move to the left and the scene shifts right, so the camel stays in view. The buttons on every card stay pinned to its bottom edge, so they're always within reach, even on a 320 px wide screen.
 
 ![The site and the game on a phone](docs/screenshots/phone-strip.jpg)
 
@@ -80,24 +92,31 @@ The repo carries its own hosting configuration:
 
 ## How it's built
 
-- **No framework, no build step.** Plain HTML, CSS and JavaScript modules. [three.js](https://threejs.org) r186 is vendored locally as a single minified file, and the three fonts are self-hosted, so the site needs nothing from other servers.
+- **No framework, no build step.** Plain HTML, CSS and JavaScript modules. [three.js](https://threejs.org) r186 is vendored locally, and the three fonts are self-hosted, so the site needs nothing from other servers.
+- **Only the three.js it needs.** [`tools/three`](tools/three) uses esbuild to bundle only the 54 parts of three.js the site uses, which makes the file about 20% smaller than the full build (151 KB gzipped). To rebuild it: `cd tools/three && npm ci && npm run build`. The site itself still has no build step.
 - **Content first.** All About, Skills, Projects, Experience and Contact content is static HTML, so it works without JavaScript, for screen readers, and for search engines. JavaScript only adds the 3D layer and the game on top.
-- **The game loads on demand.** Its code is a separate module that's only downloaded when you press the camel.
+- **Text before 3D.** The 3D globe starts only after the page has painted, so the text shows up first. The game is a separate module that's only downloaded when you press the camel.
+- **Adapts to slow devices.** If the 3D globe can't hold about 40 frames per second, it drops to a lower resolution, and then to 30 frames per second. Add `?hq` to the address to turn this off.
 - **3D on a budget.** The globe is one sphere with a custom shader that draws the continents as dots from an 8 KB land mask. Coffee cups, bugs and road lights are instanced meshes, the cities are merged geometries, and rendering pauses while the tab is hidden or the game is open.
-- **Accessible by default.** Skip link, semantic landmarks, visible focus styles, a focus trap and Esc to close in the game, a full text mode, and support for `prefers-reduced-motion` (the 3D background holds still, and the game drops camera shake and the intro camera swing).
+- **Accessible by default.** Skip link, semantic landmarks, visible focus styles, a focus trap and Esc to close in the game, a full text mode, and support for `prefers-reduced-motion` (the 3D background holds still, and the game drops camera shake and the intro camera swing). An axe-core scan finds no violations on the page, the game cards or the text mode, and Lighthouse scores 100 for accessibility, best practices and SEO.
 
 ```
-public/                     the deployed site
-├── index.html              all portfolio content
-├── 404.html                lost-caravan page
-├── assets/css/main.css     design system, layout, game UI
-├── assets/js/main.js       navigation, HUD, achievements, easter eggs
-├── assets/js/hero-scene.js the 3D globe, satellite, stars and flyby
-├── assets/js/silk-road/    the game: flow, 3D models, station content
-├── assets/vendor/          three.js (MIT)
-└── assets/fonts/           Orbitron, Space Grotesk, JetBrains Mono (OFL)
-amplify.yml                 Amplify build settings
-customHttp.yml              security and cache headers
+public/                        the deployed site
+├── index.html                 all portfolio content
+├── 404.html                   lost-caravan page
+├── manifest.json              home-screen name and icons
+├── assets/css/main.css        design system, layout, game UI
+├── assets/js/main.js          navigation, status bar, easter eggs
+├── assets/js/hero-scene.js    the 3D globe, satellite, stars and flyby
+├── assets/js/achievements.js  the 14 achievements
+├── assets/js/sfx.js           sound effects (off until you turn them on)
+├── assets/js/silk-road/       the game: flow, 3D models, station content
+├── assets/img/                project images, the globe's land mask, app icons
+├── assets/vendor/             trimmed three.js (MIT)
+└── assets/fonts/              Orbitron, Space Grotesk, JetBrains Mono (OFL)
+tools/three/                   rebuilds the trimmed three.js (not deployed)
+amplify.yml                    Amplify build settings
+customHttp.yml                 security and cache headers
 ```
 
 ### Run it locally
