@@ -54,7 +54,10 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
   /* ================================================================== */
   function setupThree() {
     const lowPower = matchMedia('(pointer: coarse)').matches || Math.min(innerWidth, innerHeight) < 700;
-    const renderer = new THREE.WebGLRenderer({ antialias: !lowPower, powerPreference: 'high-performance' });
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('webgl2', { alpha: false, antialias: !lowPower, depth: true, stencil: false, powerPreference: 'high-performance' });
+    if (!context) throw new Error('WebGL 2 is not available'); // showIntro falls back to text mode
+    const renderer = new THREE.WebGLRenderer({ canvas, context, antialias: !lowPower });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, lowPower ? 1.5 : 2));
     els.stage.append(renderer.domElement);
 

@@ -243,13 +243,11 @@ function initEasterEggs() {
 }
 
 /* ---------- WebGL check ---------- */
+// A cheap check that doesn't create a throwaway WebGL context. If the browser has WebGL 2
+// but can't actually create a context, the hero keeps its CSS background and the game
+// falls back to text mode, because both catch that failure.
 function hasWebGL() {
-  try {
-    const c = document.createElement('canvas');
-    return !!(window.WebGL2RenderingContext && c.getContext('webgl2'));
-  } catch {
-    return false;
-  }
+  return 'WebGL2RenderingContext' in window;
 }
 
 /* ---------- 3D background ---------- */
@@ -262,8 +260,11 @@ function initHeroScene() {
       .then((h) => { hero = h; })
       .catch((err) => console.warn('3D scene unavailable:', err));
   };
-  if ('requestIdleCallback' in window) requestIdleCallback(start, { timeout: 1200 });
-  else setTimeout(start, 300);
+  // Wait until the page has painted, so the text shows up before the 3D work begins.
+  requestAnimationFrame(() => setTimeout(() => {
+    if ('requestIdleCallback' in window) requestIdleCallback(start, { timeout: 1200 });
+    else start();
+  }, 0));
 }
 
 /* ---------- Silk Road 2077 game ---------- */

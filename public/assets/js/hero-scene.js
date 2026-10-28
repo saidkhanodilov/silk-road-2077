@@ -17,7 +17,10 @@ export async function initHero(canvas, { reduceMotion = false } = {}) {
   const coarse = matchMedia('(pointer: coarse)').matches;
   const lowPower = coarse || Math.min(innerWidth, innerHeight) < 700;
 
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: !lowPower, alpha: true, powerPreference: 'high-performance' });
+  // Create the context ourselves, so a browser without WebGL 2 fails quietly (main.js keeps the CSS background).
+  const context = canvas.getContext('webgl2', { alpha: true, antialias: !lowPower, depth: true, stencil: false, powerPreference: 'high-performance' });
+  if (!context) throw new Error('WebGL 2 is not available');
+  const renderer = new THREE.WebGLRenderer({ canvas, context, antialias: !lowPower, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, lowPower ? 1.5 : 1.75));
   renderer.setClearColor(0x000000, 0);
 
@@ -248,6 +251,11 @@ export async function initHero(canvas, { reduceMotion = false } = {}) {
   let raf = 0;
   let last = performance.now();
   let firstFrame = true;
+  // Adaptive quality: if frames come slowly (an older phone, or no GPU), drop the resolution
+  // first and then the frame rate, so scrolling stays smooth. ?hq turns this off.
+  let quality = new URLSearchParams(location.search).has('hq') ? -1 : 2; // 2 full, 1 lower resolution, 0 also 30 fps
+  let perfFrames = -30; // skip the first frames, while shaders compile
+  let perfTime = 0;
 
   /* ---------- Layout, input, scroll ---------- */
   let scrollP = 0;
@@ -401,11 +409,33 @@ export async function initHero(canvas, { reduceMotion = false } = {}) {
     camera.lookAt(0, -scrollP * 3, 0);
   }
 
+  function adapt(raw) {
+    if (quality <= 0 || raw > 0.25) return;
+    if (++perfFrames <= 0) return;
+    perfTime += raw;
+    if (perfFrames < 45) return;
+    const slow = perfTime / perfFrames > 1 / 40;
+    perfFrames = 0;
+    perfTime = 0;
+    if (!slow) return;
+    quality--;
+    if (quality === 1) {
+      renderer.setPixelRatio(1);
+      applyLayout();
+    }
+  }
+
   function frame(now) {
     raf = 0;
     if (paused || document.hidden) return;
-    const dt = Math.min((now - last) / 1000, 0.05);
+    if (quality === 0 && now - last < 30) {
+      raf = requestAnimationFrame(frame);
+      return;
+    }
+    const raw = (now - last) / 1000;
+    const dt = Math.min(raw, 0.05);
     last = now;
+    if (!reduceMotion) adapt(raw);
     update(reduceMotion ? 0 : dt);
     renderer.render(scene, camera);
     if (firstFrame) {

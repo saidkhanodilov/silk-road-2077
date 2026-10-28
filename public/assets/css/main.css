@@ -209,6 +209,7 @@ main, .footer { position: relative; z-index: 1; }
 .altimeter {
   position: absolute; right: 22px; top: 50%; transform: translateY(-50%);
   display: grid; justify-items: end; gap: 6px; font-size: 0.66rem; letter-spacing: 0.1em; color: rgba(163, 179, 211, 0.8);
+  text-shadow: 0 0 4px #02030a, 0 0 10px #02030a;
 }
 .alt-track { position: relative; width: 4px; height: 34vh; border-radius: 4px; background: rgba(110, 190, 255, 0.15); margin-right: 4px; }
 .alt-fill { position: absolute; left: 0; right: 0; bottom: 0; height: 0%; border-radius: 4px; background: linear-gradient(to top, var(--gold), var(--cyan)); box-shadow: 0 0 10px rgba(62, 232, 255, 0.6); }

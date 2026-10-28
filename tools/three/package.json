@@ -1,0 +1,12 @@
+{
+  "name": "silk-road-2077-three-build",
+  "private": true,
+  "description": "Builds the trimmed three.js bundle in public/assets/vendor. Not part of the deployed site.",
+  "scripts": {
+    "build": "esbuild entry.js --bundle --format=esm --minify --legal-comments=eof --outfile=../../public/assets/vendor/three.min.js"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.10",
+    "three": "0.186.1"
+  }
+}
