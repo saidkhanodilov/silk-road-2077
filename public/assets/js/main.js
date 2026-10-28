@@ -74,7 +74,6 @@ function initHud() {
   let s = 0;
   setInterval(() => { s = (s + 1) % statuses.length; statusEl.textContent = statuses[s]; }, 5200);
 
-  const hud = $('.hud');
   const fill = $('#alt-fill');
   const km = $('#alt-km');
   const v = $('#alt-v');
@@ -83,7 +82,6 @@ function initHud() {
     ticking = false;
     const max = document.documentElement.scrollHeight - window.innerHeight;
     const p = max > 0 ? Math.min(Math.max(window.scrollY / max, 0), 1) : 0;
-    hud.classList.toggle('is-past-hero', window.scrollY > window.innerHeight * 0.5);
     fill.style.height = `${(p * 100).toFixed(1)}%`;
     km.textContent = String(Math.round(p * 400));
     v.textContent = (p * 7.67).toFixed(1);

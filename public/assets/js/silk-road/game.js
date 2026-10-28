@@ -32,7 +32,7 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
   root.tabIndex = -1;
 
   const S = {
-    mode: 'idle', visited: 0, world: 0, distSinceRow: 0, speed: BASE_SPEED, camBlend: 0, introT: 0,
+    mode: 'idle', visited: 0, world: 0, distSinceRow: 0, speed: BASE_SPEED, camBlend: 0, introT: 0, snapLens: false,
     lane: 1, shipX: 0, beans: 0, bugs: 0, flightTime: 0, slowTimer: 0, shake: 0, lastRowBugs: 0,
   };
   let lastFocus = null;
@@ -241,8 +241,8 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
       red: new THREE.Color(0xff3b55), sparks: { geo: sparkGeo, pos: sparkPos, col: sparkCol, vel: sparkVel, life: sparkLife, n: SPARKS, next: 0 },
       ship, holders: [], items: Array.from({ length: MAX_ITEMS }, () => ({ active: false })),
       dummy: new THREE.Object3D(), zero: new THREE.Matrix4().makeScale(0, 0, 0), time: 0, raf: 0, last: 0,
-      camDist: 7.4, camY: 3.1, camSide: 2.4, lens: 0, vw: 1, vh: 1, portrait: false,
-      v1: new THREE.Vector3(), v2: new THREE.Vector3(), v3: new THREE.Vector3(), v4: new THREE.Vector3(), v5: new THREE.Vector3(), up: new THREE.Vector3(0, 1, 0),
+      camDist: 7.4, camY: 3.1, lens: 0, lensX: 0, panelRight: 0, vw: 1, vh: 1, portrait: false,
+      v1: new THREE.Vector3(), v2: new THREE.Vector3(), v5: new THREE.Vector3(),
     };
     resize();
   }
@@ -260,10 +260,19 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
     const halfTan = Math.tan(THREE.MathUtils.degToRad(gl.camera.fov / 2));
     gl.camDist = Math.max(7.4, 5.1 / (halfTan * aspect));
     gl.camY = 3.1 + (gl.camDist - 7.4) * 0.28;
-    gl.camSide = w >= 900 ? 2.6 : 0; // push the ship right of the side panels on wide screens
     gl.vw = w;
     gl.vh = h;
     gl.portrait = aspect < 0.9;
+    measurePanel();
+  }
+
+  // On wide and sideways screens the cards sit on the left. Remember where they end,
+  // so the lens can put the ship in the middle of the free space to their right.
+  function measurePanel() {
+    if (!gl) return;
+    const p = [els.intro, els.station, els.end].find((x) => !x.hidden);
+    const r = p && p.getBoundingClientRect();
+    gl.panelRight = r && r.left < gl.vw * 0.15 && r.right < gl.vw * 0.7 ? r.right : 0;
   }
 
   function disposeTree(obj) {
@@ -367,6 +376,7 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
 
   function showOnly(panel) {
     for (const p of [els.intro, els.station, els.end, els.text]) p.hidden = p !== panel;
+    measurePanel();
   }
 
   // `here` marks the city whose card is open; otherwise the next stop is highlighted.
@@ -604,6 +614,7 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
     S.shipX = 0;
     S.camBlend = 0;
     S.introT = 0;
+    S.snapLens = true; // open with the ship already clear of the card
     renderRoute();
     renderScore();
     setMode('intro');
@@ -790,9 +801,7 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
     if (S.mode === 'intro') S.introT += dt;
     const a = 1.5 + (reduceMotion ? 0 : Math.sin(S.introT * 0.3) * 0.75);
     const orbitPos = g.v1.set(S.shipX + Math.sin(a) * 6.8, 2.2, Math.cos(a) * 6.8);
-    const forward = g.v3.copy(ship.position).sub(orbitPos).normalize();
-    const right = g.v4.crossVectors(forward, g.up).normalize();
-    const orbitLook = g.v2.copy(ship.position).addScaledVector(right, -g.camSide);
+    const orbitLook = g.v2.copy(ship.position);
     // chase camera (playing, stations)
     const chaseX = S.shipX * 0.45;
     const chaseLookX = S.shipX * 0.3;
@@ -806,10 +815,16 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
       orbitLook.y + (1.2 - orbitLook.y) * b,
       orbitLook.z + (-16 - orbitLook.z) * b,
     );
-    // Phones: shift the lens so the ship sits above the cards that slide up from the bottom.
+    // Shift the lens so the ship stays clear of the cards: above them on phones (they slide up
+    // from the bottom), and to their right on wide or sideways screens (they sit on the left).
     const lensTarget = !g.portrait || S.mode === 'playing' ? 0 : S.mode === 'intro' ? 0.24 : 0.12;
-    g.lens += (lensTarget - g.lens) * Math.min(dt * 2.5, 1);
-    if (g.lens > 0.002) cam.setViewOffset(g.vw, g.vh, 0, g.lens * g.vh, g.vw, g.vh);
+    const sideCard = S.mode === 'intro' || S.mode === 'station' || S.mode === 'end';
+    const lensXTarget = sideCard ? g.panelRight / (2 * g.vw) : 0;
+    const ease = S.snapLens ? 1 : Math.min(dt * 2.5, 1);
+    S.snapLens = false;
+    g.lens += (lensTarget - g.lens) * ease;
+    g.lensX += (lensXTarget - g.lensX) * ease;
+    if (g.lens > 0.002 || g.lensX > 0.002) cam.setViewOffset(g.vw, g.vh, -g.lensX * g.vw, g.lens * g.vh, g.vw, g.vh);
     else if (cam.view && cam.view.enabled) cam.clearViewOffset();
   }
 
