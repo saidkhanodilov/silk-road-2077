@@ -15,6 +15,8 @@ It's a 3D, slightly fictional, slightly meme-powered website. My story is hidden
 
 The page has a hint right under the main buttons: *"Secret route detected: my story is hidden on a 3D Silk Road. Press the camel to fly it."* Press the camel and a full-screen 3D game opens on top of the page.
 
+![A seven-second flight from Samarkand to Bukhara: Java beans, the IAM policy shield, a blocked bug and the Bukhara station card](docs/screenshots/game-demo.webp)
+
 You pilot **Chelak-1**, a Bactrian-class freighter (two humps, zero bugs, hopefully), down a neon highway. Collect ☕ Java beans, dodge 🐛 NullPointerExceptions, and stop at five cities. Each city connects a famous scientist from that place to something I actually built:
 
 | Station | Then | Now (me) |

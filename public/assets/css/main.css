@@ -686,7 +686,13 @@ kbd { display: inline-block; min-width: 26px; padding: 2px 6px; border-radius: 6
 
 .game-flash { position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: 0; background: radial-gradient(circle at 50% 70%, rgba(255, 90, 110, 0.45), transparent 60%); transition: opacity 0.3s; }
 .game-flash.is-on { opacity: 1; transition: none; }
-.game-pop { position: absolute; left: 50%; top: 32%; transform: translateX(-50%); z-index: 3; pointer-events: none; font-size: clamp(0.9rem, 2.6vw, 1.2rem); font-weight: 700; text-align: center; opacity: 0; white-space: nowrap; text-shadow: 0 0 12px rgba(0, 0, 0, 0.9); }
+.game-pop {
+  position: absolute; left: 50%; top: 32%; transform: translateX(-50%); z-index: 3; pointer-events: none;
+  font-size: clamp(0.8rem, 3.6vw, 1.2rem); font-weight: 700; text-align: center; opacity: 0; white-space: nowrap;
+  /* a dark pill keeps the words readable when they float over the sun */
+  padding: 5px 14px; border-radius: 999px; background: rgba(4, 5, 13, 0.62);
+  border: 1px solid color-mix(in srgb, currentColor 40%, transparent); text-shadow: 0 0 12px rgba(0, 0, 0, 0.9);
+}
 .game-pop.is-on { animation: pop 1.3s ease forwards; }
 .game-pop.is-bug { color: var(--red); }
 .game-pop.is-bean { color: var(--gold); }
@@ -721,7 +727,7 @@ kbd { display: inline-block; min-width: 26px; padding: 2px 6px; border-radius: 6
 @media (max-width: 640px) {
   :root { --topbar-h: 58px; }
   .toasts { right: auto; left: 50%; transform: translateX(-50%); bottom: calc(14px + env(safe-area-inset-bottom)); }
-  .game:not([hidden]) ~ .toasts { top: 80px; bottom: auto; }
+  .game:not([hidden]) ~ .toasts { top: calc(80px + env(safe-area-inset-top)); bottom: auto; }
   .toast { padding: 9px 12px; gap: 10px; }
   .toast small { font-size: 0.74rem; }
   body { font-size: 1rem; }
@@ -787,6 +793,20 @@ kbd { display: inline-block; min-width: 26px; padding: 2px 6px; border-radius: 6
   .game-hud { padding-left: max(14px, env(safe-area-inset-left)); padding-right: max(14px, env(safe-area-inset-right)); }
 }
 @keyframes panel-in-left { from { opacity: 0; transform: translateX(-18px); } }
+
+/* Achievement toasts during the game on phones: compact, under the HUD, clear of the touch buttons,
+   and on the right when the phone is sideways, where they don't cover the cards. */
+@media (max-width: 640px), (max-height: 540px) and (min-aspect-ratio: 4/3) {
+  .game:not([hidden]) ~ .toasts .toast { padding: 6px 10px; gap: 8px; }
+  .game:not([hidden]) ~ .toasts .toast small { display: none; }
+  .game:not([hidden]) ~ .toasts .toast-icon { font-size: 1.2rem; }
+}
+@media (max-height: 540px) and (min-aspect-ratio: 4/3) {
+  .game:not([hidden]) ~ .toasts {
+    top: calc(80px + env(safe-area-inset-top)); bottom: auto; left: auto; right: max(14px, env(safe-area-inset-right));
+    transform: none; width: min(40vw, 300px);
+  }
+}
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
