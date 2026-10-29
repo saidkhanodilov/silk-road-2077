@@ -56,7 +56,7 @@ The game never gets in the way of the portfolio:
 | --- | --- |
 | ![Flying the camel spaceship down the neon road](docs/screenshots/game-play.jpg) | ![The camel inside an orange AccessDenied bubble, with the journey progress line at the top](docs/screenshots/game-shield.jpg) |
 | **A station** | **The finish** |
-| ![The Samarkand station card next to a hologram Registan](docs/screenshots/game-station-samarkand.jpg) | ![The Cloud: score, rank, share button and contact buttons](docs/screenshots/game-end.jpg) |
+| ![The Samarkand station card next to a hologram Registan](docs/screenshots/game-station-samarkand.jpg) | ![The Cloud: 22 Java beans, the rank Junior Camel Whisperer, the share and boarding pass buttons, and contact buttons](docs/screenshots/game-end.jpg) |
 
 ### Small things to find
 
