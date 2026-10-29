@@ -90,12 +90,19 @@ export const BEAN_MESSAGES = [
   'Garbage collector says thanks',
 ];
 
+// A rank's title comes from the beans, and a note from the bugs, if there's anything to say.
+export function rankParts(beans, bugs) {
+  let title = 'Intern (unpaid, but happy)';
+  if (beans >= 80) title = 'Senior Bean Engineer';
+  else if (beans >= 50) title = 'Mid-level Caravan Pilot';
+  else if (beans >= 20) title = 'Junior Camel Whisperer';
+  let note = '';
+  if (bugs >= 8) note = 'with a large bug collection';
+  else if (bugs === 0) note = 'zero bugs (suspicious)';
+  return { title, note };
+}
+
 export function rankFor(beans, bugs) {
-  let rank = 'Intern (unpaid, but happy)';
-  if (beans >= 80) rank = 'Senior Bean Engineer';
-  else if (beans >= 50) rank = 'Mid-level Caravan Pilot';
-  else if (beans >= 20) rank = 'Junior Camel Whisperer';
-  if (bugs >= 8) rank += ', with a large bug collection';
-  else if (bugs === 0) rank += ', zero bugs (suspicious)';
-  return rank;
+  const { title, note } = rankParts(beans, bugs);
+  return note ? `${title}, ${note}` : title;
 }

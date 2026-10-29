@@ -679,6 +679,9 @@ kbd { display: inline-block; min-width: 26px; padding: 2px 6px; border-radius: 6
 .end-stats span { font-size: 0.75rem; color: var(--muted); }
 .end-rank-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; margin-bottom: 16px; }
 .end-rank-row .end-rank { margin: 0; font-family: var(--font-display); color: var(--gold); font-size: 1.1rem; }
+.end-share { display: flex; flex-wrap: wrap; gap: 8px; }
+/* On the final card the buttons follow the rank instead of sticking to the bottom edge. */
+#g-end .station-links { position: static; margin: 0 0 16px; padding: 0; background: none; }
 .btn-small { min-height: 36px; padding: 6px 14px; font-size: 0.85rem; }
 
 .game-panel--text { width: min(94vw, 760px); max-height: calc(100% - 90px); }
@@ -750,6 +753,7 @@ kbd { display: inline-block; min-width: 26px; padding: 2px 6px; border-radius: 6
   .end-stats div { padding: 10px 6px; }
   .end-stats b { font-size: 1.2rem; }
   .end-stats span { font-size: 0.72rem; }
+  #g-end { max-height: 74vh; } /* the last card may take more of the screen: the flight is over */
 }
 /* Below this width the six city chips don't fit beside the HUD buttons, so only the current one shows. */
 @media (max-width: 820px) {
@@ -758,6 +762,8 @@ kbd { display: inline-block; min-width: 26px; padding: 2px 6px; border-radius: 6
 @media (max-width: 360px) {
   .game-panel .station-links { gap: 8px; }
   .game-panel .station-links .btn, #g-intro .panel-cta .btn { padding: 9px 12px; font-size: 0.88rem; }
+  #g-end .station-tagline { display: none; }
+  .end-rank-row .end-rank { font-size: 0.95rem; }
 }
 
 /* Phones held sideways: the hero text leaves room for the globe, the game cards sit on the left
@@ -779,10 +785,12 @@ kbd { display: inline-block; min-width: 26px; padding: 2px 6px; border-radius: 6
   .game-panel .station-tagline { font-size: 0.8rem; margin-bottom: 10px; }
   .station-block { padding: 8px 12px; margin-bottom: 8px; }
   .station-block p { font-size: 0.88rem; }
-  /* The final card is wider, with one-line stats, so the rank, share button and all three actions fit. */
+  /* The final card is wider, with one-line stats and no tagline, so the score, the rank, both share
+     buttons and the first actions fit without a scroll. */
   #g-end { width: min(62vw, 540px); }
-  .end-stats { margin-bottom: 8px; }
-  .end-stats div { display: flex; align-items: baseline; justify-content: center; gap: 6px; padding: 6px 4px; }
+  #g-end .station-tagline { display: none; }
+  .end-stats { grid-template-columns: repeat(3, auto); gap: 6px; margin-bottom: 8px; }
+  .end-stats div { display: flex; align-items: baseline; justify-content: center; gap: 6px; padding: 6px 4px; white-space: nowrap; }
   .end-stats b { font-size: 1rem; }
   .end-stats span { font-size: 0.7rem; }
   .end-rank-row { margin-bottom: 10px; }

@@ -14,7 +14,7 @@ It's a 3D, slightly fictional, slightly meme-powered website. My story is hidden
 1. Open the live site. The globe shows the real day and night, right now.
 2. Press **Play Silk Road 2077**, then **Launch 🚀**. Steer with ← → or swipes, grab ☕ Java beans and dodge 🐛 bugs.
 3. At each city, read how a scientist from there connects to something I built, then press **Fly to …**. In a hurry? ⏭ skips to the next city.
-4. At The Cloud, get your rank and share it. **Esc** takes you back to the page at any time.
+4. At The Cloud, get your rank and a boarding pass with a photo of your camel, and share them. **Esc** takes you back to the page at any time.
 
 ---
 
@@ -40,7 +40,7 @@ On the way:
 - **An IAM policy power-up.** After the first city, an orange shield sometimes appears on the road. Fly into it and an AccessDenied bubble wraps the camel, and the next bug that hits you is blocked. Least privilege, finally useful.
 - **Every city has its own sky.** As you get close to a city, the horizon, fog, grid and mountains fade into its colors: sunset orange for Chelak, turquoise tiles for Samarkand, lapis for Bukhara, desert neon for Khiva, a blue city night for Tashkent, and a pale sky above the clouds.
 - **A progress line** under the top bar, with a dot for each city and a tiny camel moving along it.
-- **A rank at the end.** The Cloud shows your beans, bugs and flight time, and gives you a rank, from "Intern (unpaid, but happy)" to "Senior Bean Engineer". **Share my rank** opens your device's share sheet, or copies a brag to the clipboard where sharing isn't available.
+- **A rank and a boarding pass at the end.** The Cloud shows your beans, bugs and flight time, and gives you a rank, from "Intern (unpaid, but happy)" to "Senior Bean Engineer". **Share my rank** opens your device's share sheet, or copies a brag to the clipboard where sharing isn't available. **Boarding pass 🎫** makes a ticket for the flight you just flew: the route from Chelak to The Cloud, your beans, bugs, flight time and rank, a snapshot of your camel taken at the finish, and the link to fly it yourself. On a phone it opens the share sheet, so you can post it or save it to your photos; on a computer it downloads.
 
 ![Five cities, five skies: Chelak, Samarkand, Bukhara, Khiva and Tashkent](docs/screenshots/game-skies.jpg)
 
@@ -73,7 +73,7 @@ The game never gets in the way of the portfolio:
 
 ## On phones
 
-The whole site and the game are built for touch screens: the layout is single-column, the 3D scene renders fewer stars, the game shows big arrow buttons, and the city cards slide up from the bottom so the 3D scene stays visible. Held sideways, the cards move to the left and the scene shifts right, so the camel stays in view. The buttons on every card stay pinned to its bottom edge, so they're always within reach, even on a 320 px wide screen.
+The whole site and the game are built for touch screens: the layout is single-column, the 3D scene renders fewer stars, the game shows big arrow buttons, and the city cards slide up from the bottom so the 3D scene stays visible. Held sideways, the cards move to the left and the scene shifts right, so the camel stays in view. The buttons on every city card stay pinned to its bottom edge, so they're always within reach, even on a 320 px wide screen, and the final card leads with your score, rank, boarding pass and the contact button.
 
 ![The site and the game on a phone](docs/screenshots/phone-strip.jpg)
 
@@ -124,7 +124,7 @@ public/                        the deployed site
 ├── assets/js/sun.js           where the sun is right now (day and night)
 ├── assets/js/achievements.js  the 14 achievements
 ├── assets/js/sfx.js           sound effects (off until you turn them on)
-├── assets/js/silk-road/       the game: flow, 3D models, station content
+├── assets/js/silk-road/       the game: flow, 3D models, stations, boarding pass
 ├── assets/img/                project images, the globe's maps, app icons
 ├── assets/vendor/             trimmed three.js (MIT)
 └── assets/fonts/              Orbitron, Space Grotesk, JetBrains Mono (OFL)

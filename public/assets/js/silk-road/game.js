@@ -6,7 +6,8 @@ import {
   createCamelShip, createCity, createGate, createCupGeometry, createBugGeometry, createShieldGeometry, createShieldBubble,
   makeGlowTexture, cssColor,
 } from './models.js';
-import { STATIONS, BUG_MESSAGES, BEAN_MESSAGES, rankFor } from './stations.js';
+import { STATIONS, BUG_MESSAGES, BEAN_MESSAGES, rankFor, rankParts } from './stations.js';
+import { makeBoardingPass } from './pass.js';
 import { sfx } from '../sfx.js';
 
 const LANES = [-3, 0, 3];
@@ -48,6 +49,7 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
   };
   let lastFocus = null;
   let gl = null; // three.js state, created on first launch
+  let pass = null; // the boarding pass for the last finished flight: a promise of a JPEG file
 
   /* ================================================================== */
   /* three.js world                                                      */
@@ -479,6 +481,10 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
     buildEndPanel();
     showOnly(els.end);
     els.end.querySelector('[data-contact]').focus({ preventScroll: true });
+    // Draw the boarding pass now, so it's ready the moment it's asked for: phones only open
+    // the share sheet straight from a tap, with no waiting in between.
+    pass = preparePass();
+    pass.catch((err) => console.warn('No boarding pass this time', err));
   }
 
   function skip() {
@@ -574,7 +580,8 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
       el('p', 'station-kicker', [el('span', '', 'FINAL STOP · JOURNEY COMPLETE'), el('span', '', '🏁')]),
       el('h2', '', st.name),
       el('p', 'station-tagline', st.tagline),
-      // The score comes first: it's the payoff, and it stays clear of the sticky buttons below.
+      // The payoff first: the score, the rank and the ways onward. The story blocks come last,
+      // so on small screens nothing important needs a scroll.
       el('div', 'end-stats', [
         el('div', '', [el('b', '', String(S.beans)), el('span', '', 'Java beans')]),
         el('div', '', [el('b', '', String(S.bugs)), el('span', '', 'bugs hit')]),
@@ -582,21 +589,32 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
       ]),
       el('div', 'end-rank-row', [
         el('p', 'end-rank', `Rank: ${rankFor(S.beans, S.bugs)}`),
-        button('Share my rank ↗', 'btn btn-ghost btn-small', shareRank),
+        el('div', 'end-share', [
+          button('Share my rank ↗', 'btn btn-ghost btn-small', shareRank),
+          button('Boarding pass 🎫', 'btn btn-ghost btn-small', savePass),
+        ]),
       ]),
-      ...stationBlocks(st),
       el('div', 'station-links', [
         portfolioLink('#contact', 'Contact me ✉️', 'btn btn-primary'),
         button('Fly again 🔁', 'btn btn-ghost', startRun),
         button('Back to the portfolio', 'btn btn-ghost', close),
       ]),
+      ...stationBlocks(st),
     );
     els.end.querySelector('.btn-primary').setAttribute('data-contact', '');
   }
 
+  // Where to send people: the page's canonical address when it names one, so a pass made on a
+  // preview or a local copy still points at the real site.
+  function siteUrl() {
+    const canonical = document.querySelector('link[rel="canonical"]');
+    const url = new URL(canonical ? canonical.href : location.href);
+    return `${url.origin}${url.pathname}`;
+  }
+
   async function shareRank(e) {
     const btn = e.currentTarget;
-    const url = `${location.origin}${location.pathname}`;
+    const url = siteUrl();
     const text = `I flew Silk Road 2077 on Saidmuxammadxon's portfolio: ${S.beans} Java beans, ${S.bugs} bugs, `
       + `${fmtTime(S.flightTime)} flight time. Rank: ${rankFor(S.beans, S.bugs)}. Can you beat it?`;
     try {
@@ -610,6 +628,59 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
       if (err && err.name === 'AbortError') return; // the share sheet was closed
       btn.textContent = 'Sharing is blocked here, sorry';
     }
+  }
+
+  // A square snapshot of the camel for the boarding pass, from a camera of its own. The normal
+  // view is drawn again straight after, so the snapshot never reaches the screen.
+  function shipPhoto() {
+    const canvas = gl.renderer.domElement;
+    const cam = gl.photoCam || (gl.photoCam = new THREE.PerspectiveCamera(38, 1, 0.1, 1200));
+    cam.aspect = canvas.width / canvas.height;
+    cam.updateProjectionMatrix();
+    const ship = gl.ship.group.position;
+    cam.position.set(ship.x - 5.8, ship.y + 1.6, ship.z - 6.2);
+    cam.lookAt(ship.x, ship.y + 0.3, ship.z + 0.5); // the body sits a little behind the nose
+    gl.renderer.render(gl.scene, cam);
+    const side = Math.min(canvas.width, canvas.height);
+    const photo = document.createElement('canvas');
+    photo.width = photo.height = Math.min(side, 640);
+    photo.getContext('2d').drawImage(canvas, (canvas.width - side) / 2, (canvas.height - side) / 2, side, side, 0, 0, photo.width, photo.height);
+    gl.renderer.render(gl.scene, gl.camera);
+    return photo;
+  }
+
+  async function preparePass() {
+    const blob = await makeBoardingPass({
+      beans: S.beans, bugs: S.bugs, time: fmtTime(S.flightTime), rank: rankParts(S.beans, S.bugs),
+      photo: shipPhoto(), link: siteUrl().replace(/^https?:\/\//, '').replace(/\/$/, ''),
+    });
+    return new File([blob], 'silk-road-2077-boarding-pass.jpg', { type: blob.type });
+  }
+
+  async function savePass(e) {
+    const btn = e.currentTarget;
+    let file;
+    try {
+      file = await pass;
+    } catch {
+      btn.textContent = 'No pass this time, sorry';
+      return;
+    }
+    // Phones: the share sheet, to post it or save it to photos. Everywhere else: a download.
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file], title: 'Silk Road 2077', text: `My Silk Road 2077 boarding pass. Fly it yourself: ${siteUrl()}` });
+        return;
+      } catch (err) {
+        if (err && err.name === 'AbortError') return; // the share sheet was closed
+      }
+    }
+    const a = el('a', '', null, { href: URL.createObjectURL(file), download: file.name });
+    document.body.append(a); // some browsers only download from a link that's on the page
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+    btn.textContent = 'Saved to downloads ✓';
   }
 
   function showText() {
