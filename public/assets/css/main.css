@@ -243,6 +243,16 @@ main, .footer { position: relative; z-index: 1; }
   90% { transform: translateY(-3px) rotate(6deg); }
 }
 .btn-ghost { color: var(--text); background: rgba(8, 12, 32, 0.8); border-color: var(--line-strong); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+/* A Play button while the game's code loads (main.js), and Launch while the 3D world is built (game.js) */
+.is-loading { cursor: progress; }
+.btn.is-loading { color: transparent; }
+.btn.is-loading::after { content: 'Loading…'; position: absolute; inset: 0; display: grid; place-items: center; color: var(--text); }
+.btn-primary.is-loading::after { color: #1d1100; }
+.btn-launch.is-loading::after { padding-left: calc(1.3em + 10px); } /* centered over the label, clear of the camel */
+.btn.is-loading .btn-emoji { color: #1d1100; } /* a transparent color would hide the emoji too */
+.btn.is-loading .btn-emoji, .play-chip.is-loading > span:first-child { display: inline-block; animation: camel-spin 0.8s linear infinite; }
+.play-chip.is-loading .play-chip-label { opacity: 0.55; }
+@keyframes camel-spin { to { transform: rotate(360deg); } }
 .btn-ghost:hover { color: var(--text); border-color: var(--cyan); box-shadow: var(--glow-cyan); }
 
 /* ---------- Reveal on scroll ---------- */
@@ -686,6 +696,7 @@ kbd { display: inline-block; min-width: 26px; padding: 2px 6px; border-radius: 6
 
 .game-panel--text { width: min(94vw, 760px); max-height: calc(100% - 90px); }
 .text-station { padding: 16px 0; border-top: 1px dashed var(--line); }
+.game-panel .text-why { padding: 10px 14px; border: 1px dashed rgba(255, 190, 85, 0.45); border-radius: 12px; color: var(--gold); font-size: 0.9rem; }
 .text-station h3 { font-family: var(--font-display); font-size: 1.1rem; margin-bottom: 8px; }
 
 .game-flash { position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: 0; background: radial-gradient(circle at 50% 70%, rgba(255, 90, 110, 0.45), transparent 60%); transition: opacity 0.3s; }

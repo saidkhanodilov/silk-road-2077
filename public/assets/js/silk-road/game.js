@@ -49,6 +49,7 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
   };
   let lastFocus = null;
   let gl = null; // three.js state, created on first launch
+  let building = false; // the first launch's world build is on its way (see showIntro)
   let pass = null; // the boarding pass for the last finished flight: a promise of a JPEG file
 
   /* ================================================================== */
@@ -694,9 +695,13 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
     const actions = [];
     if (webgl) actions.push(button('Fly it in 3D instead 🐫', 'btn btn-primary', showIntro));
     actions.push(button('Close', 'btn btn-ghost', close));
+    // Without WebGL the Play buttons land here too, so say why the 3D flight didn't start.
+    const why = webgl ? [] : [el('p', 'text-why', '3D graphics (WebGL) are turned off or blocked in this browser, so the route opens as text. '
+      + 'To fly it, turn on graphics acceleration in the browser\'s settings (in Chrome: Settings, System, "Use graphics acceleration when available"), or try another browser.')];
     els.text.replaceChildren(
       el('p', 'mono tiny dim', 'SILK ROAD 2077 · TEXT MODE'),
       el('h2', '', 'The route, as text'),
+      ...why,
       el('p', '', 'Five cities of my story, plus the Cloud. Each one connects a famous scientist from that city to something I built.'),
       ...list,
       el('div', 'panel-cta', actions),
@@ -722,13 +727,18 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
   function showIntro() {
     if (!webgl) return showText();
     if (!gl) {
-      try {
-        setupThree();
-      } catch (err) {
-        console.warn('WebGL failed, falling back to text mode', err);
-        webgl = false;
-        return showText();
+      // Building the 3D world the first time can freeze a slow machine for a second or two, so
+      // the card shows first (its Launch button waits) and the world is built once it's on screen.
+      setMode('intro');
+      showOnly(els.intro);
+      els.start.disabled = true;
+      els.start.classList.add('is-loading');
+      root.focus({ preventScroll: true });
+      if (!building) {
+        building = true;
+        requestAnimationFrame(() => setTimeout(buildWorld, 0));
       }
+      return;
     }
     clearWorld();
     S.visited = 0;
@@ -745,6 +755,22 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
     showOnly(els.intro);
     startLoop();
     els.start.focus({ preventScroll: true });
+  }
+
+  function buildWorld() {
+    building = false;
+    try {
+      setupThree();
+    } catch (err) {
+      console.warn('WebGL failed, falling back to text mode', err);
+      webgl = false;
+    }
+    els.start.disabled = false;
+    els.start.classList.remove('is-loading');
+    // Carry on only if the card is still up (the game may have been closed or switched to text).
+    if (root.hidden || S.mode !== 'intro') return;
+    if (webgl) showIntro();
+    else showText();
   }
 
   // Every city has its own sky. As you enter a city's airspace (the last stretch of road

@@ -67,7 +67,7 @@ export function toast(opts) {
 
 function pump() {
   if (!els || showing >= 2 || !queue.length) return;
-  const { icon = '🏆', label = 'ACHIEVEMENT UNLOCKED', title, text = '' } = queue.shift();
+  const { icon = '🏆', label = 'ACHIEVEMENT UNLOCKED', title, text = '', duration = 3400 } = queue.shift();
   showing++;
   const el = document.createElement('div');
   el.className = 'toast';
@@ -95,7 +95,7 @@ function pump() {
       showing--;
       pump();
     }, 380);
-  }, 3400);
+  }, duration);
 }
 
 export function unlock(id) {

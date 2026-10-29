@@ -268,7 +268,12 @@ function initHeroScene() {
   const start = () => {
     import('./hero-scene.js')
       .then((m) => m.initHero($('#space'), { reduceMotion }))
-      .then((h) => { hero = h; })
+      .then((h) => {
+        hero = h;
+        // The globe is up, so fetch the game's code while the visitor reads.
+        if ('requestIdleCallback' in window) requestIdleCallback(prefetchGame, { timeout: 4000 });
+        else setTimeout(prefetchGame, 1500);
+      })
       .catch((err) => console.warn('3D scene unavailable:', err));
   };
   // Wait until the page has painted, so the text shows up before the 3D work begins.
@@ -279,11 +284,46 @@ function initHeroScene() {
 }
 
 /* ---------- Silk Road 2077 game ---------- */
+// The game's code is fetched once the globe is up, or as soon as a Play button is pointed at or
+// focused, so pressing Play rarely has to wait for the network.
+let gameCode = null;
+function loadGameCode() {
+  if (!gameCode) {
+    gameCode = import('./silk-road/game.js').catch((err) => {
+      gameCode = null; // let the next press ask again (Chrome remembers the failure until a reload)
+      throw err;
+    });
+  }
+  return gameCode;
+}
+
+function prefetchGame() {
+  loadGameCode().catch(() => {}); // a failure is reported when Play is pressed
+}
+
+// A Play button says "Loading…" while it waits for the game (see .is-loading in main.css).
+function setLoading(btn, on) {
+  btn.classList.toggle('is-loading', on);
+  if (on) btn.setAttribute('aria-busy', 'true');
+  else btn.removeAttribute('aria-busy');
+}
+
+// A short reason for a failure, so that a screenshot of the toast says what went wrong.
+function errorText(err) {
+  const msg = (err && err.message) || String(err);
+  return msg.length > 140 ? `${msg.slice(0, 139)}…` : msg;
+}
+
 let gamePromise = null;
 function initGameLaunchers() {
+  let waiting = false;
   const launch = async (mode, opener) => {
+    if (waiting) return; // pressed again while the game was still loading
+    waiting = true;
+    // Say so only if the wait is long enough to notice.
+    const busy = setTimeout(() => setLoading(opener, true), 150);
     if (!gamePromise) {
-      gamePromise = import('./silk-road/game.js').then((m) => m.createGame({
+      gamePromise = loadGameCode().then((m) => m.createGame({
         root: $('#game'),
         webgl: hasWebGL(),
         reduceMotion,
@@ -298,7 +338,14 @@ function initGameLaunchers() {
     } catch (err) {
       console.error(err);
       gamePromise = null;
-      toast({ icon: '🛠️', label: 'HOUSTON, WE HAVE A PROBLEM', title: 'The game failed to load.', text: 'Please refresh and try again.' });
+      toast({
+        icon: '🛠️', label: 'HOUSTON, WE HAVE A PROBLEM', title: 'The game failed to load.',
+        text: `Please refresh and try again. (${errorText(err)})`, duration: 9000,
+      });
+    } finally {
+      clearTimeout(busy);
+      setLoading(opener, false);
+      waiting = false;
     }
   };
   document.addEventListener('click', (e) => {
@@ -307,6 +354,14 @@ function initGameLaunchers() {
     e.preventDefault();
     launch(btn.dataset.launchGame === 'text' ? 'text' : 'play', btn);
   });
+  const warm = (e) => {
+    if (!e.target.closest('[data-launch-game]')) return;
+    document.removeEventListener('pointerover', warm);
+    document.removeEventListener('focusin', warm);
+    prefetchGame();
+  };
+  document.addEventListener('pointerover', warm, { passive: true });
+  document.addEventListener('focusin', warm);
 }
 
 /* ---------- Boot ---------- */
