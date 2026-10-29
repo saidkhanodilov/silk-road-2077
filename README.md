@@ -142,7 +142,7 @@ Any static file server works. With Python:
 python3 -m http.server 8080 --directory public
 ```
 
-Then open http://localhost:8080.
+Then open http://localhost:8080. Opening `index.html` straight from your disk shows the page but not the globe or the game, because browsers don't run JavaScript modules from `file://` pages; the page says so after a few seconds.
 
 ---
 

@@ -705,6 +705,12 @@ kbd { display: inline-block; min-width: 26px; padding: 2px 6px; border-radius: 6
 .game-loading { position: absolute; inset: 0; display: grid; place-items: center; z-index: 5; font-family: var(--font-mono); color: var(--cyan); font-size: 0.9rem; letter-spacing: 0.1em; }
 
 .noscript { position: fixed; bottom: 0; left: 0; right: 0; z-index: 90; margin: 0; padding: 10px; text-align: center; background: var(--panel-strong); color: var(--gold); font-size: 0.8rem; }
+/* Scripts are on, but main.js never ran: a file opened from disk (browsers block modules there) or a very old browser. */
+.script-failed { display: none; }
+@media (scripting: enabled) {
+  html:not(.js-ready) .script-failed { display: block; animation: script-failed-in 0.3s 4s both; }
+}
+@keyframes script-failed-in { from { opacity: 0; visibility: hidden; } }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 1080px) {
