@@ -596,7 +596,8 @@ main, .footer { position: relative; z-index: 1; }
 .game.is-text, .game-panel { user-select: text; -webkit-user-select: text; touch-action: auto; }
 .game[hidden] { display: none; }
 .game-stage { position: absolute; inset: 0; }
-.game-stage canvas { display: block; width: 100%; height: 100%; }
+.game-stage canvas { display: block; width: 100%; height: 100%; opacity: 0; transition: opacity 0.6s ease; }
+.game-stage.is-live canvas { opacity: 1; }
 .game-hud {
   position: absolute; top: 0; left: 0; right: 0; z-index: 3; display: flex; align-items: center; gap: 12px;
   padding: calc(10px + env(safe-area-inset-top)) 14px 10px; background: linear-gradient(rgba(2, 3, 10, 0.85), transparent);

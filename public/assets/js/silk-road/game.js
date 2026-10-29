@@ -317,7 +317,7 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
     for (const it of gl.items) it.active = false;
   }
 
-  function spawnStation(i, z) {
+  function buildStation(i) {
     const st = STATIONS[i];
     const holder = new THREE.Group();
     const gate = createGate(st.name, st.color);
@@ -330,13 +330,67 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
     });
     holder.add(gate, createCity(st.id, st.color));
     holder.userData.gate = { obj: gate, mats: gateMats, k: 1 };
-    holder.position.z = z;
     holder.userData.index = i;
     holder.userData.labels = [];
     holder.traverse((o) => { if (o.isSprite) holder.userData.labels.push(o); });
+    return holder;
+  }
+
+  function spawnStation(i, z) {
+    const holder = buildStation(i);
+    holder.position.z = z;
     gl.scene.add(holder);
     gl.holders.push(holder);
     return holder;
+  }
+
+  // The first time a shader is drawn it gets compiled and set up, which can stall a slow machine
+  // for a second, and that used to happen right after Launch. So it all happens while the card is
+  // up and the canvas is still hidden: every shader of the flight is compiled (in the background
+  // where the browser can), then the world is drawn once along with a stand-in for each city.
+  // The stand-ins' materials are deliberately not disposed, which keeps their shaders cached for
+  // the real cities.
+  function warmUp() {
+    const standIns = STATIONS.map((_, i) => buildStation(i));
+    const staging = new THREE.Scene();
+    staging.add(...standIns);
+    let compiled;
+    try {
+      const r = gl.renderer;
+      if (r.extensions.has('KHR_parallel_shader_compile')) {
+        compiled = Promise.all([r.compileAsync(gl.scene, gl.camera), r.compileAsync(staging, gl.camera, gl.scene)]);
+      } else {
+        // Without background compiling, the frame below waits for them instead.
+        r.compile(gl.scene, gl.camera);
+        r.compile(staging, gl.camera, gl.scene);
+        compiled = Promise.resolve();
+      }
+    } catch (err) {
+      console.warn('Shader warm-up skipped', err);
+      compiled = Promise.resolve();
+    }
+    const timeout = new Promise((resolve) => setTimeout(resolve, 5000)); // a lost context never finishes
+    return Promise.race([compiled, timeout]).catch(() => {}).then(() => {
+      const culled = [];
+      for (const h of standIns) gl.scene.add(h);
+      gl.scene.traverse((o) => { if (o.frustumCulled) { o.frustumCulled = false; culled.push(o); } });
+      const hidden = [gl.shieldItem, gl.bubble];
+      for (const o of hidden) o.visible = true;
+      try {
+        gl.renderer.render(gl.scene, gl.camera);
+      } catch (err) {
+        console.warn('Warm-up frame failed', err);
+      }
+      for (const o of hidden) o.visible = false;
+      for (const o of culled) o.frustumCulled = true;
+      for (const h of standIns) {
+        gl.scene.remove(h);
+        h.traverse((o) => {
+          if (o.geometry) o.geometry.dispose();
+          if (o.material && o.material.map) o.material.map.dispose();
+        });
+      }
+    });
   }
 
   /* ---------- items ---------- */
@@ -726,7 +780,7 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
 
   function showIntro() {
     if (!webgl) return showText();
-    if (!gl) {
+    if (!gl || building) {
       // Building the 3D world the first time can freeze a slow machine for a second or two, so
       // the card shows first (its Launch button waits) and the world is built once it's on screen.
       setMode('intro');
@@ -754,17 +808,24 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
     setMode('intro');
     showOnly(els.intro);
     startLoop();
+    els.stage.classList.add('is-live'); // fades the world in the first time
     els.start.focus({ preventScroll: true });
   }
 
   function buildWorld() {
-    building = false;
     try {
       setupThree();
     } catch (err) {
       console.warn('WebGL failed, falling back to text mode', err);
       webgl = false;
+      finishBuild();
+      return;
     }
+    warmUp().then(finishBuild);
+  }
+
+  function finishBuild() {
+    building = false;
     els.start.disabled = false;
     els.start.classList.remove('is-loading');
     // Carry on only if the card is still up (the game may have been closed or switched to text).
