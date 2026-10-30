@@ -365,15 +365,14 @@ function initGameLaunchers() {
 }
 
 /* ---------- Boot ---------- */
-initReveal();
-initAchievements();
-initNav();
-initHud();
-initTyped();
-initCounters();
-initTilt();
-initShots();
-initEasterEggs();
-initGameLaunchers();
-initHeroScene();
+// Each part starts on its own, so one that breaks in some browser can't take the others down.
+// The Play buttons go first: pressing one should always get an answer.
+for (const init of [initGameLaunchers, initReveal, initAchievements, initNav, initHud, initTyped,
+  initCounters, initTilt, initShots, initEasterEggs, initHeroScene]) {
+  try {
+    init();
+  } catch (err) {
+    console.error(`${init.name} failed:`, err);
+  }
+}
 setTimeout(() => unlock('hello-world'), 1800);

@@ -25,6 +25,9 @@
   <link rel="preload" href="assets/fonts/space-grotesk.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="assets/css/main.css">
   <script type="module" src="assets/js/main.js"></script>
+  <!-- main.js imports these two, so fetch them alongside it instead of after it -->
+  <link rel="modulepreload" href="assets/js/achievements.js">
+  <link rel="modulepreload" href="assets/js/sun.js">
 
   <script type="application/ld+json">
   {
