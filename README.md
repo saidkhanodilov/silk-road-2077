@@ -61,6 +61,7 @@ The game never gets in the way of the portfolio:
 ### Small things to find
 
 - **The globe shows the real day and night.** The lit half is wherever the sun is up right now, worked out from your clock, with a gold band along sunrise and sunset. After dark, the cities light up, placed from the populations of over 7,000 cities and towns. Visit in the evening (Tashkent time) and Uzbekistan glows amber under the beacon.
+- A hand-drawn 32×32 pixel-art avatar of me in the pilot dossier, and again on the last card of the game.
 - 14 achievements, saved in your browser (the 🏆 counter in the top bar). One of them is for 15 Java beans in a row without a single bug.
 - A status bar with the current time in Tashkent, a ☀ or ☾ for whether the sun is up there ("night in Tashkent, replies after breakfast 🌙"), a rotating developer status ("it works on my machine ✓"), and an altimeter that climbs from 0 to the ISS (400 km) as you scroll.
 - A satellite circling the globe on a 51.6° orbit, the same target orbit SimulateUz flies to.

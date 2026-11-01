@@ -66,6 +66,7 @@ export const STATIONS = [
     now: 'Next stop: your team. I\'m looking for internships and trainee roles in software engineering.',
     meme: 'There is no cloud. It\'s just someone else\'s computer. Thanks for lending me yours, AWS.',
     link: { href: '#contact', label: 'Open a comms channel' },
+    photo: { src: 'assets/img/me-avatar.png', alt: 'Pixel-art avatar of Saidmuxammadxon', caption: 'Your pilot today. Say hi, I reply faster than my code compiles.' },
   },
 ];
 
