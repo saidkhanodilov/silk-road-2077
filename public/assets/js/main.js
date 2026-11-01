@@ -198,6 +198,44 @@ function initShots() {
   });
 }
 
+// Camera roll: tap the top polaroid and it flies off, then slides in at the back of the deck
+function initRoll() {
+  const deck = $('#roll-deck');
+  if (!deck) return;
+  const count = $('#roll-count');
+  const cards = $$('.polaroid', deck);
+  let order = cards.map((_, i) => i);
+  const seen = new Set([0]);
+  let busy = false;
+
+  const layout = () => {
+    order.forEach((card, pos) => {
+      cards[card].dataset.pos = String(pos);
+      // only the top photo can be clicked or tabbed to
+      cards[card].inert = pos !== 0;
+    });
+    count.textContent = `${order[0] + 1} / ${cards.length}`;
+  };
+
+  deck.addEventListener('click', (e) => {
+    const top = cards[order[0]];
+    if (busy || !top.contains(e.target)) return;
+    busy = true;
+    const hadFocus = top.contains(document.activeElement);
+    top.classList.add('is-tossed');
+    setTimeout(() => {
+      order = [...order.slice(1), order[0]];
+      layout();
+      top.classList.remove('is-tossed');
+      seen.add(order[0]);
+      if (seen.size === cards.length) unlock('paparazzi');
+      if (hadFocus) $('button', cards[order[0]]).focus({ preventScroll: true });
+      busy = false;
+    }, reduceMotion ? 0 : 260);
+  });
+  layout();
+}
+
 // Easter eggs
 function emojiRain(emojis, count = 36) {
   if (reduceMotion) return;
@@ -369,7 +407,7 @@ function initGameLaunchers() {
 // Each part starts on its own, so one that breaks in some browser can't take the others down.
 // The Play buttons go first: pressing one should always get an answer.
 for (const init of [initGameLaunchers, initReveal, initAchievements, initNav, initHud, initTyped,
-  initCounters, initTilt, initShots, initEasterEggs, initHeroScene]) {
+  initCounters, initTilt, initShots, initRoll, initEasterEggs, initHeroScene]) {
   try {
     init();
   } catch (err) {

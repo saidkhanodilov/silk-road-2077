@@ -55,6 +55,7 @@ export const STATIONS = [
     now: 'I study Computer Science at Central Asian University and lead the campus AWS Student Builder Group, running hands-on cloud workshops for students.',
     meme: 'Rule #1 of my AWS workshops: set up a billing alarm. Rule #2: see rule #1.',
     link: { href: '#about', label: 'Read my story' },
+    photo: { src: 'assets/img/roll-cau.webp', alt: 'Selfie in front of the glowing CAU letters at night', caption: 'Field photo: Central Asian University, after dark.' },
   },
   {
     id: 'cloud',
@@ -66,6 +67,7 @@ export const STATIONS = [
     now: 'Next stop: your team. I\'m looking for internships and trainee roles in software engineering.',
     meme: 'There is no cloud. It\'s just someone else\'s computer. Thanks for lending me yours, AWS.',
     link: { href: '#contact', label: 'Open a comms channel' },
+    photo: { src: 'assets/img/me-avatar.webp', alt: 'Photo of Saidmuxammadxon', caption: 'Your pilot today. Say hi, I reply faster than my code compiles.' },
   },
 ];
 

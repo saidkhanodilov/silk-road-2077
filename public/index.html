@@ -80,7 +80,7 @@
       </button>
       <button class="chip-btn trophy-chip" type="button" id="trophy-btn" aria-haspopup="dialog">
         <span class="sr-only">Achievements:</span>
-        <span aria-hidden="true">🏆</span> <span id="trophy-count">0</span><span class="trophy-total">/14</span>
+        <span aria-hidden="true">🏆</span> <span id="trophy-count">0</span><span class="trophy-total">/15</span>
       </button>
       <button class="menu-toggle" type="button" id="menu-toggle" aria-expanded="false" aria-controls="site-nav">
         <span class="menu-icon" aria-hidden="true"><i></i><i></i><i></i></span>
@@ -152,28 +152,62 @@
         </header>
 
         <div class="about-grid">
-          <article class="dossier holo tilt reveal" aria-label="Pilot dossier">
-            <div class="dossier-top">
-              <div class="avatar" aria-hidden="true">
-                <span>SO</span><i class="avatar-scan"></i>
+          <div class="about-side">
+            <article class="dossier holo tilt reveal" aria-label="Pilot dossier">
+              <div class="dossier-top">
+                <div class="avatar">
+                  <img src="assets/img/me-avatar.webp" alt="Photo of Saidmuxammadxon" width="320" height="320" decoding="async">
+                  <i class="avatar-scan" aria-hidden="true"></i>
+                </div>
+                <div>
+                  <p class="mono tiny dim">PILOT ID · UZ-2026-CAU-01</p>
+                  <h3 class="dossier-name">Saidmuxammadxon Odilov</h3>
+                  <p class="mono callsign">Callsign: SAIDXON</p>
+                </div>
               </div>
-              <div>
-                <p class="mono tiny dim">PILOT ID · UZ-2026-CAU-01</p>
-                <h3 class="dossier-name">Saidmuxammadxon Odilov</h3>
-                <p class="mono callsign">Callsign: SAIDXON</p>
-              </div>
-            </div>
-            <dl class="dossier-list">
-              <div><dt>Origin</dt><dd>Chelak, Samarkand Region</dd></div>
-              <div><dt>Base</dt><dd>Tashkent, Uzbekistan</dd></div>
-              <div><dt>Academy</dt><dd>Central Asian University, BSc Computer Science (2026 to 2030)</dd></div>
-              <div><dt>Class</dt><dd>Backend engineer · physics simulator</dd></div>
-              <div><dt>Languages</dt><dd>Uzbek (native) · English (IELTS 7.5)</dd></div>
-              <div><dt>Rank</dt><dd>AWS Student Builder Group Leader</dd></div>
-              <div><dt>Fuel</dt><dd>☕️ Java, the drink and the language</dd></div>
-              <div><dt>Status</dt><dd class="status-ok">Open to internships and trainee roles</dd></div>
-            </dl>
-          </article>
+              <dl class="dossier-list">
+                <div><dt>Origin</dt><dd>Chelak, Samarkand Region</dd></div>
+                <div><dt>Base</dt><dd>Tashkent, Uzbekistan</dd></div>
+                <div><dt>Academy</dt><dd>Central Asian University, BSc Computer Science (2026 to 2030)</dd></div>
+                <div><dt>Class</dt><dd>Backend engineer · physics simulator</dd></div>
+                <div><dt>Languages</dt><dd>Uzbek (native) · English (IELTS 7.5)</dd></div>
+                <div><dt>Rank</dt><dd>AWS Student Builder Group Leader</dd></div>
+                <div><dt>Fuel</dt><dd>☕️ Java, the drink and the language</dd></div>
+                <div><dt>Status</dt><dd class="status-ok">Open to internships and trainee roles</dd></div>
+              </dl>
+            </article>
+
+            <section class="roll reveal" aria-labelledby="roll-title">
+              <p class="roll-head mono tiny"><span id="roll-title">FIELD LOG · CAMERA ROLL</span><span id="roll-count" aria-live="polite"></span></p>
+              <ol class="roll-deck" id="roll-deck">
+                <li class="polaroid">
+                  <button type="button" aria-label="Next photo">
+                    <img src="assets/img/roll-cau.webp" alt="Selfie in a hoodie in front of the glowing blue CAU letters at Central Asian University, at night" width="600" height="800" loading="lazy" decoding="async">
+                    <span class="polaroid-cap"><small>IMG_2077_001</small>Home base: CAU, after dark. The hoodie is standard issue.</span>
+                  </button>
+                </li>
+                <li class="polaroid">
+                  <button type="button" aria-label="Next photo">
+                    <img src="assets/img/roll-lights.webp" alt="Unimpressed selfie under a sign covered in light bulbs" width="600" height="800" loading="lazy" decoding="async">
+                    <span class="polaroid-cap"><small>IMG_2077_002</small>My face when the build passes on the first try. Something is wrong.</span>
+                  </button>
+                </li>
+                <li class="polaroid">
+                  <button type="button" aria-label="Next photo">
+                    <img src="assets/img/roll-lake.webp" alt="Selfie at night by a lit-up lake in Tashkent" width="600" height="800" loading="lazy" decoding="async">
+                    <span class="polaroid-cap"><small>IMG_2077_003</small>Night walk in Tashkent, still thinking about a NullPointerException.</span>
+                  </button>
+                </li>
+                <li class="polaroid">
+                  <button type="button" aria-label="Next photo">
+                    <img src="assets/img/roll-fuel.webp" alt="Holding a can of energy drink" width="600" height="800" loading="lazy" decoding="async">
+                    <span class="polaroid-cap"><small>IMG_2077_004</small>Backup fuel, for when the Java beans run out.</span>
+                  </button>
+                </li>
+              </ol>
+              <p class="roll-hint mono tiny dim">Tap the photo for the next one.</p>
+            </section>
+          </div>
 
           <div class="story holo reveal">
             <p class="mono tiny dim">TRANSMISSION LOG · YEAR 2077 (OKAY, 2026)</p>

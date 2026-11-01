@@ -61,7 +61,8 @@ The game never gets in the way of the portfolio:
 ### Small things to find
 
 - **The globe shows the real day and night.** The lit half is wherever the sun is up right now, worked out from your clock, with a gold band along sunrise and sunset. After dark, the cities light up, placed from the populations of over 7,000 cities and towns. Visit in the evening (Tashkent time) and Uzbekistan glows amber under the beacon.
-- 14 achievements, saved in your browser (the 🏆 counter in the top bar). One of them is for 15 Java beans in a row without a single bug.
+- A camera roll in the About section: a deck of polaroids from my life in Tashkent. Tap the top one and it flies to the back. My photo in the pilot dossier starts as a cyan hologram and "decrypts" to full color when you hover it.
+- 15 achievements, saved in your browser (the 🏆 counter in the top bar). One of them is for 15 Java beans in a row without a single bug.
 - A status bar with the current time in Tashkent, a ☀ or ☾ for whether the sun is up there ("night in Tashkent, replies after breakfast 🌙"), a rotating developer status ("it works on my machine ✓"), and an altimeter that climbs from 0 to the ISS (400 km) as you scroll.
 - A satellite circling the globe on a 51.6° orbit, the same target orbit SimulateUz flies to.
 - A camel spaceship that flies past every now and then.
@@ -122,7 +123,7 @@ public/                        the deployed site
 ├── assets/js/main.js          navigation, status bar, easter eggs
 ├── assets/js/hero-scene.js    the 3D globe, satellite, stars and flyby
 ├── assets/js/sun.js           where the sun is right now (day and night)
-├── assets/js/achievements.js  the 14 achievements
+├── assets/js/achievements.js  the 15 achievements
 ├── assets/js/sfx.js           sound effects (off until you turn them on)
 ├── assets/js/silk-road/       the game: flow, 3D models, stations, boarding pass
 ├── assets/img/                project images, the globe's maps, app icons

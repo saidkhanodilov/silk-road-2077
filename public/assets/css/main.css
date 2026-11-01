@@ -364,14 +364,23 @@ main, .footer { position: relative; z-index: 1; }
 .dossier { padding: 28px; }
 .dossier-top { display: flex; gap: 18px; align-items: center; margin-bottom: 22px; }
 .avatar {
-  position: relative; flex: none; width: 92px; height: 92px; display: grid; place-items: center; overflow: hidden;
+  position: relative; flex: none; width: 104px; height: 104px; overflow: hidden;
   clip-path: polygon(25% 4%, 75% 4%, 100% 50%, 75% 96%, 25% 96%, 0 50%);
   background:
     repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.07) 0 1px, transparent 1px 4px),
     linear-gradient(135deg, rgba(62, 232, 255, 0.85), rgba(91, 124, 255, 0.85) 55%, rgba(255, 79, 210, 0.85));
 }
-.avatar span { font-family: var(--font-display); font-weight: 900; font-size: 1.7rem; color: #04050d; letter-spacing: 0.04em; }
+.avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .avatar-scan { position: absolute; left: 0; right: 0; height: 18px; top: -20px; background: linear-gradient(transparent, rgba(255, 255, 255, 0.65), transparent); animation: scan 3.2s linear infinite; }
+/* The photo starts as a cyan hologram and "decrypts" to full color when you hover or focus the card. */
+.avatar::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; transition: opacity 0.6s ease;
+  background:
+    repeating-linear-gradient(0deg, rgba(4, 5, 13, 0.35) 0 1px, transparent 1px 3px),
+    linear-gradient(160deg, var(--cyan), var(--lapis) 60%, var(--magenta));
+  mix-blend-mode: color; opacity: 0.9;
+}
+.dossier:hover .avatar::after, .dossier:focus-within .avatar::after { opacity: 0; }
 @keyframes scan { to { top: 100%; } }
 .dossier-name { font-family: var(--font-display); font-size: clamp(1rem, 2.4vw, 1.25rem); font-weight: 700; margin: 4px 0; overflow-wrap: anywhere; }
 .callsign { color: var(--gold); font-size: 0.82rem; margin: 0; }
@@ -381,6 +390,37 @@ main, .footer { position: relative; z-index: 1; }
 .dossier-list dd { margin: 0; font-size: 0.98rem; }
 .status-ok { color: var(--green); }
 .status-ok::before { content: "● "; animation: caret 1.6s steps(1) infinite; }
+
+/* Camera roll: a deck of polaroids, tap the top one to send it to the back */
+.about-side { display: grid; gap: clamp(24px, 4vw, 40px); }
+.roll { width: min(340px, 84%); justify-self: center; }
+.roll-head { display: flex; justify-content: space-between; gap: 10px; white-space: nowrap; color: var(--cyan); letter-spacing: 0.14em; margin-bottom: 18px; }
+@media (max-width: 360px) { .roll-head { letter-spacing: 0.04em; } }
+.roll-deck { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.polaroid button {
+  display: block; width: 100%; padding: 10px 10px 0; border: 0; border-radius: 4px; cursor: pointer; text-align: left;
+  background: #f4f0e6; color: #1b1f33; box-shadow: 0 26px 50px -18px rgba(0, 0, 0, 0.9);
+}
+.polaroid img { width: 100%; height: auto; aspect-ratio: 3 / 4; object-fit: cover; background: #0a0d1f; }
+.polaroid-cap { display: block; padding: 10px 2px 14px; font-size: 0.86rem; line-height: 1.35; min-height: 4.6em; }
+.polaroid-cap small { display: block; font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.1em; color: #6b6f86; margin-bottom: 2px; }
+.roll-hint { text-align: center; margin: 14px 0 0; }
+.roll-hint, #roll-count { display: none; }
+/* With JavaScript the photos stack into one deck. */
+.js-ready .roll-deck { display: block; position: relative; aspect-ratio: 3 / 4.75; }
+.js-ready .roll-hint, .js-ready #roll-count { display: block; }
+.js-ready .polaroid { position: absolute; inset: 0 0 auto; transition: transform 0.45s cubic-bezier(.2, .8, .2, 1), opacity 0.3s; }
+.polaroid[data-pos="0"] { z-index: 4; transform: rotate(-2.5deg); }
+.polaroid[data-pos="1"] { z-index: 3; transform: translate(12px, 6px) rotate(4deg); }
+.polaroid[data-pos="2"] { z-index: 2; transform: translate(-10px, 10px) rotate(-6deg); }
+.polaroid[data-pos="3"] { z-index: 1; transform: translate(6px, 14px) rotate(7deg); }
+.polaroid[data-pos="0"] button:hover { box-shadow: 0 30px 60px -18px rgba(0, 0, 0, 0.9), var(--glow-cyan); }
+.polaroid.is-tossed { transform: translate(70%, -6%) rotate(16deg); opacity: 0; }
+
+/* A photo on a station card in the game */
+.station-photo { display: flex; gap: 12px; align-items: center; margin: 0 0 10px; }
+.station-photo img { flex: none; width: 66px; height: 88px; object-fit: cover; border-radius: 8px; border: 2px solid #f4f0e6; transform: rotate(-3deg); }
+.station-photo figcaption { font-family: var(--font-mono); font-size: 0.78rem; color: var(--muted); }
 
 .story { padding: clamp(20px, 3vw, 30px); }
 .story p { color: #d3def5; }

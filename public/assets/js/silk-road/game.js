@@ -595,7 +595,12 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
     return a;
   }
   function stationBlocks(st) {
+    const photo = st.photo ? [el('figure', 'station-photo', [
+      el('img', '', null, { src: st.photo.src, alt: st.photo.alt, width: '66', height: '88', decoding: 'async' }),
+      el('figcaption', '', st.photo.caption),
+    ])] : [];
     return [
+      ...photo,
       el('div', 'station-block', [el('b', '', 'THEN'), el('p', '', st.then)]),
       el('div', 'station-block', [el('b', '', 'NOW · ME'), el('p', '', st.now)]),
       el('div', 'station-block station-meme', [el('b', '', 'MEME TRANSMISSION'), el('p', '', st.meme)]),
