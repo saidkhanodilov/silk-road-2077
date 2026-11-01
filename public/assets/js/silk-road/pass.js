@@ -108,7 +108,7 @@ export async function makeBoardingPass({ beans, bugs, time, rank, photo, link, d
     ctx.fill();
   }
 
-  /* ---------- the pass ---------- */
+  // the pass
   write(ctx, 'SILK ROAD 2077', PAD, 64, { font: `900 26px ${DISPLAY}`, color: COLORS.cyan, spacing: 3 });
   write(ctx, 'BOARDING PASS', STUB - PAD, 62, { font: `500 15px ${MONO}`, color: COLORS.muted, align: 'right', spacing: 5 });
   ctx.fillStyle = COLORS.line;
@@ -168,7 +168,7 @@ export async function makeBoardingPass({ beans, bugs, time, rank, photo, link, d
   if (rank.note) write(ctx, rank.note, PAD, 562, { font: `500 16px ${MONO}`, color: COLORS.muted });
   write(ctx, 'Baggage: 1 laptop, unlimited coffee. Bugs are not allowed on board.', PAD, 604, { font: `400 13px ${MONO}`, color: COLORS.dim });
 
-  /* ---------- the stub ---------- */
+  // the stub
   const sx = STUB + 36;
   const sw = W - sx - 36;
   write(ctx, 'CHELAK-1', sx, 64, { font: `900 20px ${DISPLAY}`, spacing: 2 });

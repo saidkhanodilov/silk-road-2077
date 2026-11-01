@@ -34,7 +34,7 @@ export async function initHero(canvas, { reduceMotion = false } = {}) {
 
   const glowTex = makeGlowTexture();
 
-  /* ---------- Stars ---------- */
+  // Stars
   const starCount = lowPower ? 1400 : 3200;
   const sPos = new Float32Array(starCount * 3);
   const sSize = new Float32Array(starCount);
@@ -79,7 +79,7 @@ export async function initHero(canvas, { reduceMotion = false } = {}) {
   const stars = new THREE.Points(starGeo, starMat);
   scene.add(stars);
 
-  /* ---------- Earth ---------- */
+  // Earth
   const R = 14;
   const earthGroup = new THREE.Group();
   scene.add(earthGroup);
@@ -96,6 +96,9 @@ export async function initHero(canvas, { reduceMotion = false } = {}) {
     tex.generateMipmaps = false;
     return tex;
   }));
+  // The TASHKENT label is drawn onto a canvas once. On a slow connection Orbitron might not be
+  // here yet and the label would be stuck in the fallback font forever.
+  await document.fonts.load('700 120px Orbitron').catch(() => {});
 
   const earthMat = new THREE.ShaderMaterial({
     uniforms: {
@@ -265,7 +268,7 @@ export async function initHero(canvas, { reduceMotion = false } = {}) {
   const trail = new THREE.Line(trailGeo, new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false }));
   orbit.add(trail);
 
-  /* ---------- Girih stars ---------- */
+  // Girih stars
   // They float in the empty margins beside the text column (see applyLayout), never behind words.
   const girih = [];
   const girihColors = [0x3ee8ff, 0xffbe55, 0xff4fd2, 0x5b7cff];
@@ -281,7 +284,7 @@ export async function initHero(canvas, { reduceMotion = false } = {}) {
     scene.add(s);
   }
 
-  /* ---------- Camel flyby ---------- */
+  // Camel flyby
   const camel = createCamelShip();
   camel.group.scale.setScalar(1.3);
   camel.group.visible = false;
@@ -290,7 +293,7 @@ export async function initHero(canvas, { reduceMotion = false } = {}) {
   let flyStart = -1;
   const FLY_TIME = 9;
 
-  /* ---------- Render loop state (declared early: onScroll may ask for a frame during setup) ---------- */
+  // Render loop state (declared early: onScroll may ask for a frame during setup)
   let paused = false;
   let raf = 0;
   let last = performance.now();
@@ -301,7 +304,7 @@ export async function initHero(canvas, { reduceMotion = false } = {}) {
   let perfFrames = -30; // skip the first frames, while shaders compile
   let perfTime = 0;
 
-  /* ---------- Layout, input, scroll ---------- */
+  // Layout, input, scroll
   let scrollP = 0;
   let heroP = 0;
   let endP = 0;
@@ -377,7 +380,7 @@ export async function initHero(canvas, { reduceMotion = false } = {}) {
   window.addEventListener('scroll', onScroll, { passive: true });
   if (!coarse) window.addEventListener('pointermove', onPointer, { passive: true });
 
-  /* ---------- Update & render ---------- */
+  // Update & render
   let t = 0;
   let satAngle = 0.6;
   const satHistory = [];

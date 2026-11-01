@@ -52,9 +52,7 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
   let building = false; // the first launch's world build is on its way (see showIntro)
   let pass = null; // the boarding pass for the last finished flight: a promise of a JPEG file
 
-  /* ================================================================== */
-  /* three.js world                                                      */
-  /* ================================================================== */
+  // ---- three.js world ----
   function setupThree() {
     const lowPower = matchMedia('(pointer: coarse)').matches || Math.min(innerWidth, innerHeight) < 700;
     const canvas = document.createElement('canvas');
@@ -393,7 +391,7 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
     });
   }
 
-  /* ---------- items ---------- */
+  // items
   function addItem(type, lane, z) {
     const it = gl.items.find((x) => !x.active);
     if (!it) return;
@@ -445,9 +443,7 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
     }
   }
 
-  /* ================================================================== */
-  /* game flow                                                           */
-  /* ================================================================== */
+  // ---- game flow ----
   function setMode(mode) {
     S.mode = mode;
     root.classList.toggle('is-playing', mode === 'playing');
@@ -574,7 +570,7 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
     root.focus({ preventScroll: true });
   }
 
-  /* ---------- DOM helpers (textContent only, never innerHTML) ---------- */
+  // DOM helpers (textContent only, never innerHTML)
   function el(tag, className, content, attrs = {}) {
     const node = document.createElement(tag);
     if (className) node.className = className;
@@ -622,9 +618,8 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
   }
 
   function fmtTime(sec) {
-    const m = Math.floor(sec / 60);
-    const s = Math.round(sec % 60);
-    return `${m}:${String(s).padStart(2, '0')}`;
+    const total = Math.round(sec); // round first, or 59.6 s shows up as "0:60"
+    return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`;
   }
 
   function buildEndPanel() {
@@ -672,15 +667,19 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
     const url = siteUrl();
     const text = `I flew Silk Road 2077 on Saidmuxammadxon's portfolio: ${S.beans} Java beans, ${S.bugs} bugs, `
       + `${fmtTime(S.flightTime)} flight time. Rank: ${rankFor(S.beans, S.bugs)}. Can you beat it?`;
-    try {
-      if (navigator.share) {
+    if (navigator.share) {
+      try {
         await navigator.share({ title: 'Silk Road 2077', text, url });
         return;
+      } catch (err) {
+        if (err && err.name === 'AbortError') return; // closed the share sheet
+        // anything else (desktop Chrome says NotAllowedError a lot): try the clipboard
       }
+    }
+    try {
       await navigator.clipboard.writeText(`${text} ${url}`);
       btn.textContent = 'Copied to clipboard ✓';
-    } catch (err) {
-      if (err && err.name === 'AbortError') return; // the share sheet was closed
+    } catch {
       btn.textContent = 'Sharing is blocked here, sorry';
     }
   }
@@ -797,12 +796,16 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
     clearWorld();
     S.visited = 0;
     S.world = 0;
+    S.beans = 0;
+    S.bugs = 0;
     S.shield = false;
     S.lane = 1;
     S.shipX = 0;
     S.camBlend = 0;
     S.introT = 0;
     S.snapLens = true; // open with the ship already clear of the card
+    gl.progress = -1;
+    els.progress.style.setProperty('--p', '0');
     renderRoute();
     renderScore();
     setMode('intro');
@@ -870,9 +873,7 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
     g.sunGlow.material.color.copy(SUN_GLOW).lerp(g.ridgeMat.color, 0.35);
   }
 
-  /* ================================================================== */
-  /* per-frame update                                                    */
-  /* ================================================================== */
+  // ---- per-frame update ----
   function update(dt) {
     const g = gl;
     g.time += dt;
@@ -1133,9 +1134,7 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
     if (gl) gl.raf = 0;
   }
 
-  /* ================================================================== */
-  /* input                                                               */
-  /* ================================================================== */
+  // ---- input ----
   function steer(dir) {
     if (S.mode !== 'playing') return;
     S.lane = Math.min(2, Math.max(0, S.lane + dir));
@@ -1206,9 +1205,7 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
     if (sfx.enabled) sfx.bean();
   });
 
-  /* ================================================================== */
-  /* open / close                                                        */
-  /* ================================================================== */
+  // ---- open / close ----
   function open(mode = 'play', opener = null) {
     lastFocus = opener || document.activeElement;
     root.hidden = false;
@@ -1219,6 +1216,7 @@ export function createGame({ root, webgl = true, reduceMotion = false, unlock = 
     window.addEventListener('pointerup', onPointerUp);
     window.addEventListener('resize', resize);
     document.addEventListener('visibilitychange', onVisibility);
+    resize(); // the window may have changed while the game was closed
     if (mode === 'text' || !webgl) showText();
     else showIntro();
   }

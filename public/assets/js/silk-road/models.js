@@ -53,9 +53,7 @@ export function mergeParts(parts) {
   return out;
 }
 
-/* ------------------------------------------------------------------ */
-/* Chelak-1: a two-humped, Bactrian-class freighter. Faces -Z.         */
-/* ------------------------------------------------------------------ */
+// Chelak-1: a two-humped, Bactrian-class freighter. Faces -Z.
 export function createCamelShip() {
   const SILVER = 0xd6deee;
   const GOLD = 0xffb547;
@@ -151,9 +149,7 @@ export function createCamelShip() {
   };
 }
 
-/* ------------------------------------------------------------------ */
-/* Girih star: two overlapping squares, a classic Central Asian motif. */
-/* ------------------------------------------------------------------ */
+// Girih star: two overlapping squares, a classic Central Asian motif.
 export function createGirihStar(radius = 1, color = 0x3ee8ff, opacity = 0.7) {
   const material = new THREE.LineBasicMaterial({ color, transparent: true, opacity, blending: THREE.AdditiveBlending, depthWrite: false });
   const group = new THREE.Group();
@@ -175,9 +171,7 @@ export function createGirihStar(radius = 1, color = 0x3ee8ff, opacity = 0.7) {
   return group;
 }
 
-/* ------------------------------------------------------------------ */
-/* Text sprites                                                       */
-/* ------------------------------------------------------------------ */
+// Text sprites
 export function makeLabel(text, { color = '#ffffff', height = 2, font = 'Orbitron', weight = 800, glow = true } = {}) {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
@@ -207,9 +201,7 @@ export function makeLabel(text, { color = '#ffffff', height = 2, font = 'Orbitro
   return sprite;
 }
 
-/* ------------------------------------------------------------------ */
-/* Collectibles                                                       */
-/* ------------------------------------------------------------------ */
+// Collectibles
 export function createCupGeometry() {
   return mergeParts([
     { geo: new THREE.CylinderGeometry(0.42, 0.32, 0.62, 14), color: 0xffe2a8 },
@@ -313,9 +305,7 @@ export function makeGlowTexture(size = 128) {
   return tex;
 }
 
-/* ------------------------------------------------------------------ */
-/* City skylines: hologram buildings made of merged primitives.        */
-/* ------------------------------------------------------------------ */
+// City skylines: hologram buildings made of merged primitives.
 const P = {
   dome(x, z, r, drum = r * 0.9, y = 0) {
     return [

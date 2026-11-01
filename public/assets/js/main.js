@@ -10,7 +10,7 @@ const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matc
 const $ = (sel, el = document) => el.querySelector(sel);
 const $$ = (sel, el = document) => [...el.querySelectorAll(sel)];
 
-/* ---------- Reveal on scroll (elements already on screen show immediately) ---------- */
+// Reveal on scroll (elements already on screen show immediately)
 function initReveal() {
   const items = $$('.reveal');
   for (const el of items) {
@@ -33,7 +33,7 @@ function initReveal() {
   items.filter((el) => !el.classList.contains('is-visible')).forEach((el) => io.observe(el));
 }
 
-/* ---------- Navigation ---------- */
+// Navigation
 function initNav() {
   const toggle = $('#menu-toggle');
   const nav = $('#site-nav');
@@ -58,7 +58,7 @@ function initNav() {
   $$('main > section[id]').forEach((s) => io.observe(s));
 }
 
-/* ---------- HUD: Tashkent clock, status memes, altimeter ---------- */
+// HUD: Tashkent clock, status memes, altimeter
 function initHud() {
   const timeEl = $('#hud-time');
   const skyEl = $('#hud-sky');
@@ -104,7 +104,7 @@ function initHud() {
   update();
 }
 
-/* ---------- Hero: typed roles and counters ---------- */
+// Hero: typed roles and counters
 function initTyped() {
   const el = $('#typed');
   const roles = [
@@ -163,7 +163,7 @@ function initCounters() {
   nums.forEach((el) => io.observe(el));
 }
 
-/* ---------- 3D tilt on holo cards ---------- */
+// 3D tilt on holo cards
 function initTilt() {
   if (!finePointer || reduceMotion) return;
   for (const el of $$('.tilt')) {
@@ -185,7 +185,7 @@ function initTilt() {
   }
 }
 
-/* ---------- SimulateUz screenshot stack ---------- */
+// SimulateUz screenshot stack
 function initShots() {
   const stack = $('#shot-stack');
   if (!stack) return;
@@ -198,7 +198,7 @@ function initShots() {
   });
 }
 
-/* ---------- Easter eggs ---------- */
+// Easter eggs
 function emojiRain(emojis, count = 36) {
   if (reduceMotion) return;
   for (let i = 0; i < count; i++) {
@@ -215,14 +215,15 @@ function emojiRain(emojis, count = 36) {
 }
 
 function initEasterEggs() {
-  const code = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
-  let pos = 0;
+  const code = 'ArrowUp ArrowUp ArrowDown ArrowDown ArrowLeft ArrowRight ArrowLeft ArrowRight b a';
+  // Just remember the last 10 keys. (Counting matches broke on ↑ ↑ ↑ ↓ ↓ …, the extra ↑ reset it.)
+  let recent = [];
   document.addEventListener('keydown', (e) => {
     if (!$('#game').hidden) return;
-    const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
-    pos = key === code[pos] ? pos + 1 : (key === code[0] ? 1 : 0);
-    if (pos === code.length) {
-      pos = 0;
+    recent.push(e.key.length === 1 ? e.key.toLowerCase() : e.key);
+    recent = recent.slice(-10);
+    if (recent.join(' ') === code) {
+      recent = [];
       const on = document.body.classList.toggle('meme-mode');
       emojiRain(['☕️', '🐛', '🐫', '🚀', '☁️', '💾']);
       if (!unlock('konami')) {
@@ -253,7 +254,7 @@ function initEasterEggs() {
     'Try the Konami code: ↑ ↑ ↓ ↓ ← → ← → B A', small);
 }
 
-/* ---------- WebGL check ---------- */
+// WebGL check
 // A cheap check that doesn't create a throwaway WebGL context. If the browser has WebGL 2
 // but can't actually create a context, the hero keeps its CSS background and the game
 // falls back to text mode, because both catch that failure.
@@ -261,7 +262,7 @@ function hasWebGL() {
   return 'WebGL2RenderingContext' in window;
 }
 
-/* ---------- 3D background ---------- */
+// 3D background
 let hero = null;
 function initHeroScene() {
   if (!hasWebGL()) return;
@@ -283,7 +284,7 @@ function initHeroScene() {
   }, 0));
 }
 
-/* ---------- Silk Road 2077 game ---------- */
+// Silk Road 2077 game
 // The game's code is fetched once the globe is up, or as soon as a Play button is pointed at or
 // focused, so pressing Play rarely has to wait for the network.
 let gameCode = null;
@@ -364,7 +365,7 @@ function initGameLaunchers() {
   document.addEventListener('focusin', warm);
 }
 
-/* ---------- Boot ---------- */
+// Boot
 // Each part starts on its own, so one that breaks in some browser can't take the others down.
 // The Play buttons go first: pressing one should always get an answer.
 for (const init of [initGameLaunchers, initReveal, initAchievements, initNav, initHud, initTyped,
