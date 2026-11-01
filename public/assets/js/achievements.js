@@ -17,7 +17,6 @@ export const ACHIEVEMENTS = [
   { id: 'least-privilege', icon: '🛡️', title: 'Least privilege', desc: 'Blocked a bug with the IAM policy power-up.' },
   { id: 'konami', icon: '🎮', title: 'Konami commander', desc: 'Entered the Konami code. Meme mode engaged.' },
   { id: 'curious', icon: '🔍', title: 'Curious clicker', desc: 'Clicked the logo five times and found a dev secret.' },
-  { id: 'paparazzi', icon: '📸', title: 'Paparazzi', desc: 'Went through the whole camera roll.' },
 ];
 
 const unlocked = new Set();

@@ -55,7 +55,6 @@ export const STATIONS = [
     now: 'I study Computer Science at Central Asian University and lead the campus AWS Student Builder Group, running hands-on cloud workshops for students.',
     meme: 'Rule #1 of my AWS workshops: set up a billing alarm. Rule #2: see rule #1.',
     link: { href: '#about', label: 'Read my story' },
-    photo: { src: 'assets/img/roll-cau.webp', alt: 'Selfie in front of the glowing CAU letters at night', caption: 'Field photo: Central Asian University, after dark.' },
   },
   {
     id: 'cloud',

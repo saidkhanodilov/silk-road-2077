@@ -36,8 +36,7 @@ Details I added because they're me:
 - **An IAM policy power-up.** An orange AccessDenied shield blocks the next bug. Least privilege, finally useful.
 - **Every city has its own sky:** turquoise tiles in Samarkand, lapis in Bukhara, desert neon in Khiva.
 - **A rank and a boarding pass at the end.** You get a rank from "Intern (unpaid, but happy)" to "Senior Bean Engineer", plus a shareable boarding pass with a snapshot of your camel.
-- **A camera roll of real photos**: polaroids you flip through in the About section. My dossier photo starts as a hologram and decrypts on hover. The same photos show up on the Tashkent and Cloud cards in the game.
-- **The hero globe shows the real day and night right now**, worked out from the sun's position, with city lights placed from 7,000+ real populations. There are also 15 achievements, a Konami-code meme mode, and a lost-caravan 404 page.
+- **The hero globe shows the real day and night right now**, worked out from the sun's position, with city lights placed from 7,000+ real populations. There are also 14 achievements, a Konami-code meme mode, and a lost-caravan 404 page.
 
 **It never gets in the way of navigation.** The game is optional, and every fact in it is also in the normal HTML page. Esc closes it and returns you to where you were. A "Read it as text" mode works for screen readers and for devices without WebGL. It runs on keyboard, touch buttons, and swipes.
 
